@@ -37,28 +37,22 @@ jobs:
       - name: Build project
         run: |
           bun run build
-          # We check which folder exists and make sure index.html is there
-          if [ -d ".output/public" ]; then
-            cp .output/public/index.html .output/public/404.html || true
-            echo "DEPLOY_PATH=.output/public" >> $GITHUB_ENV
-          elif [ -d "dist" ]; then
-            cp dist/index.html dist/404.html || true
-            echo "DEPLOY_PATH=dist" >> $GITHUB_ENV
-          else
-            echo "No build folder found!"
-            exit 1
+          # Create the fallback for routing
+          if [ -d "dist" ]; then
+            cp dist/index.html dist/404.html
+            echo "TARGET_DIR=dist" >> $GITHUB_ENV
+          elif [ -d ".output/public" ]; then
+            cp .output/public/index.html .output/public/404.html
+            echo "TARGET_DIR=.output/public" >> $GITHUB_ENV
           fi
         env:
           VITE_LOVABLE_TAGGER: false
           CI: false
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ env.DEPLOY_PATH }}
+          path: ${{ env.TARGET_DIR }}
 
       - name: Deploy to GitHub Pages
         id: deployment
