@@ -13,9 +13,6 @@ concurrency:
   group: "pages"
   cancel-in-progress: false
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
   deploy:
     environment:
@@ -37,16 +34,18 @@ jobs:
       - name: Build project
         run: |
           bun run build
-          # This forces the creation of a 404 page so the router doesn't break
-          cp dist/index.html dist/404.html || cp .output/public/index.html .output/public/404.html || echo "No index found"
+          # Create fallback for routing
+          cp dist/index.html dist/404.html || echo "Using dist folder"
         env:
           VITE_LOVABLE_TAGGER: false
           CI: false
 
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # We will try the most common Vite folder first
           path: './dist'
 
       - name: Deploy to GitHub Pages
