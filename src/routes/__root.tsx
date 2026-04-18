@@ -38,6 +38,15 @@ export const Route = createRootRoute({
         content:
           "A developmental portfolio documenting growth across five institutional outcomes and sixteen indicators of teaching competence.",
       },
+      { property: "og:title", content: "Developmental Portfolio — Jaymes Merc Lebron Ramos" },
+      { name: "twitter:title", content: "Developmental Portfolio — Jaymes Merc Lebron Ramos" },
+      { name: "description", content: "This application showcases a developmental portfolio with self-assessment, evidence, and reflection sections." },
+      { property: "og:description", content: "This application showcases a developmental portfolio with self-assessment, evidence, and reflection sections." },
+      { name: "twitter:description", content: "This application showcases a developmental portfolio with self-assessment, evidence, and reflection sections." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/8ed71c3a-ab6b-4be6-803c-074dc62640d3/id-preview-468b2849--1616339b-6fcb-433f-afc3-4bfb3a8cb02c.lovable.app-1776530714023.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/8ed71c3a-ab6b-4be6-803c-074dc62640d3/id-preview-468b2849--1616339b-6fcb-433f-afc3-4bfb3a8cb02c.lovable.app-1776530714023.png" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:type", content: "website" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
