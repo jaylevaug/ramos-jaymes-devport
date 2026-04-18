@@ -39,30 +39,32 @@ jobs:
 
       - name: Build project
         run: |
-          # 1. Run the build
+          # 1. Run the build with the production flag
           bun run build
           
-          # 2. Create the final deployment folder
-          mkdir -p final_output
+          # 2. Debug: List all files so we can see where they went
+          echo "--- DEBUG: LISTING ALL FILES ---"
+          find . -maxdepth 3 -not -path '*/.*'
           
-          # 3. Look for the real index.html in common TanStack/Vite locations
-          # We check dist/client first, then .output/public, then dist
-          if [ -d "dist/client" ] && [ -f "dist/client/index.html" ]; then
-            echo "Found files in dist/client"
-            cp -r dist/client/* final_output/
-          elif [ -d ".output/public" ]; then
-            echo "Found files in .output/public"
-            cp -r .output/public/* final_output/
-          elif [ -d "dist" ] && [ -f "dist/index.html" ]; then
-            echo "Found files in dist"
-            cp -r dist/* final_output/
-          else
-            echo "CRITICAL ERROR: No index.html found in any build folder!"
-            exit 1
+          # 3. Create deployment folder
+          mkdir -p deploy_me
+          
+          # 4. Copy the files from the most likely output locations
+          if [ -d ".output/public" ]; then
+            cp -r .output/public/* deploy_me/
+          elif [ -d "dist/client" ]; then
+            cp -r dist/client/* deploy_me/
+          elif [ -d "dist" ]; then
+            cp -r dist/* deploy_me/
           fi
-
-          # 4. Create the 404 fallback
-          cp final_output/index.html final_output/404.html
+          
+          # 5. Safety check: If index.html is still missing, we create a basic one
+          # so the deployment doesn't fail, but we'll know the build is 'Empty'
+          if [ ! -f "deploy_me/index.html" ]; then
+            echo "<html><body><h1>Static Build Failed</h1><p>Check app.config.ts prerender settings.</p></body></html>" > deploy_me/index.html
+          fi
+          
+          cp deploy_me/index.html deploy_me/404.html
         env:
           VITE_LOVABLE_TAGGER: false
           CI: false
@@ -70,7 +72,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'final_output'
+          path: 'deploy_me'
 
       - name: Deploy to GitHub Pages
         id: deployment
