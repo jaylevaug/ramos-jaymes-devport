@@ -39,32 +39,17 @@ jobs:
 
       - name: Build project
         run: |
-          # 1. Run the build with the production flag
+          # Run the build command
           bun run build
           
-          # 2. Debug: List all files so we can see where they went
-          echo "--- DEBUG: LISTING ALL FILES ---"
-          find . -maxdepth 3 -not -path '*/.*'
-          
-          # 3. Create deployment folder
-          mkdir -p deploy_me
-          
-          # 4. Copy the files from the most likely output locations
-          if [ -d ".output/public" ]; then
-            cp -r .output/public/* deploy_me/
-          elif [ -d "dist/client" ]; then
-            cp -r dist/client/* deploy_me/
-          elif [ -d "dist" ]; then
-            cp -r dist/* deploy_me/
+          # Create the 404 page by copying index.html
+          if [ -f "dist/index.html" ]; then
+            cp dist/index.html dist/404.html
+          else
+            echo "ERROR: index.html not found in dist folder!"
+            ls -R dist
+            exit 1
           fi
-          
-          # 5. Safety check: If index.html is still missing, we create a basic one
-          # so the deployment doesn't fail, but we'll know the build is 'Empty'
-          if [ ! -f "deploy_me/index.html" ]; then
-            echo "<html><body><h1>Static Build Failed</h1><p>Check app.config.ts prerender settings.</p></body></html>" > deploy_me/index.html
-          fi
-          
-          cp deploy_me/index.html deploy_me/404.html
         env:
           VITE_LOVABLE_TAGGER: false
           CI: false
@@ -72,7 +57,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'deploy_me'
+          # We point exactly to the 'dist' folder defined in vite.config.ts
+          path: 'dist'
 
       - name: Deploy to GitHub Pages
         id: deployment
