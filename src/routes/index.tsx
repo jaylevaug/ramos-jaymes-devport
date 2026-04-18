@@ -23,7 +23,7 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
-const ROLES = ["a digital literate and date-drive decision maker", "a design thinker and innovator", "a discerning and compassionate person", "a dynamic lifelong learner and leader", "a deeply-rooted global citizen", "a proud PNUan", "a future-ready teacher"];
+const ROLES = ["Digital Literate Educator", "Future Math Teacher", "Lifelong Learner", "Reflective Practitioner"];
 
 function Typewriter() {
   const [index, setIndex] = useState(0);
