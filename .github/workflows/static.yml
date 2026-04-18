@@ -37,14 +37,8 @@ jobs:
       - name: Build project
         run: |
           bun run build
-          # Create the fallback for routing
-          if [ -d "dist" ]; then
-            cp dist/index.html dist/404.html
-            echo "TARGET_DIR=dist" >> $GITHUB_ENV
-          elif [ -d ".output/public" ]; then
-            cp .output/public/index.html .output/public/404.html
-            echo "TARGET_DIR=.output/public" >> $GITHUB_ENV
-          fi
+          # This forces the creation of a 404 page so the router doesn't break
+          cp dist/index.html dist/404.html || cp .output/public/index.html .output/public/404.html || echo "No index found"
         env:
           VITE_LOVABLE_TAGGER: false
           CI: false
@@ -52,7 +46,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ env.TARGET_DIR }}
+          # We will try the most common Vite folder first
+          path: './dist'
 
       - name: Deploy to GitHub Pages
         id: deployment
