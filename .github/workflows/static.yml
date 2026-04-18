@@ -42,11 +42,14 @@ jobs:
       - name: Build project
         run: |
           bun run build
-          # This command finds exactly where index.html is hiding
-          export ACTUAL_PATH=$(find . -name index.html -not -path "*/node_modules/*" -not -path "*/src/*" | head -n 1 | xargs dirname)
+          # We search for index.html but ignore the source folder
+          ACTUAL_PATH=$(find . -name index.html -not -path "*/node_modules/*" -not -path "./src/*" | head -n 1 | xargs dirname)
+          if [ -z "$ACTUAL_PATH" ]; then
+            echo "Error: index.html not found after build!"
+            exit 1
+          fi
           echo "FOUND_PATH=$ACTUAL_PATH" >> $GITHUB_ENV
-          # Create a 404 fallback so refreshes don't break
-          cp $ACTUAL_PATH/index.html $ACTUAL_PATH/404.html
+          cp "$ACTUAL_PATH/index.html" "$ACTUAL_PATH/404.html"
         env:
           VITE_LOVABLE_TAGGER: false
           CI: false
