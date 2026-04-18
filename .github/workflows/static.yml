@@ -36,10 +36,9 @@ jobs:
 
       - name: Build project
         run: |
-          # We force TanStack to build a static site
           bun run build
-        env:
-          VITE_LOVABLE_TAGGER: false
+          # This ensures refreshing the page doesn't cause a 404
+          cp dist/index.html dist/404.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v6
@@ -47,9 +46,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          # IMPORTANT: TanStack Start often puts static files in .output/public
-          # If this fails, we will try './dist' next.
-          path: './.output/public'
+          # Changed this back to dist based on your error log
+          path: './dist'
 
       - name: Deploy to GitHub Pages
         id: deployment
