@@ -42,14 +42,9 @@ jobs:
       - name: Build project
         run: |
           bun run build
-          # We search for index.html but ignore the source folder
-          ACTUAL_PATH=$(find . -name index.html -not -path "*/node_modules/*" -not -path "./src/*" | head -n 1 | xargs dirname)
-          if [ -z "$ACTUAL_PATH" ]; then
-            echo "Error: index.html not found after build!"
-            exit 1
-          fi
-          echo "FOUND_PATH=$ACTUAL_PATH" >> $GITHUB_ENV
-          cp "$ACTUAL_PATH/index.html" "$ACTUAL_PATH/404.html"
+          # We go directly to the folder instead of searching
+          # TanStack Start always outputs to .output/public
+          cp .output/public/index.html .output/public/404.html
         env:
           VITE_LOVABLE_TAGGER: false
           CI: false
@@ -57,7 +52,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ env.FOUND_PATH }}
+          # This matches the folder TanStack actually creates
+          path: '.output/public'
 
       - name: Deploy to GitHub Pages
         id: deployment
