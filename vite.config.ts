@@ -4,9 +4,9 @@ import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
   plugins: [react(), tsconfigPaths()],
-  // Verify this matches your GitHub repo name exactly
-  base: "/ramos-jaymes-devport/",
+  // Changing this to './' makes the site look in the current folder
+  base: './', 
   build: {
-    outDir: "dist",
+    outDir: 'dist',
   },
 });
