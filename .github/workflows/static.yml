@@ -39,22 +39,30 @@ jobs:
 
       - name: Build project
         run: |
-          # We use 'bun run build' which now points to 'bun x vite build'
+          # 1. Run the build
           bun run build
           
-          # Logic to ensure index.html exists for GitHub
+          # 2. Create the final deployment folder
+          mkdir -p final_output
+          
+          # 3. Look for the real index.html in common TanStack/Vite locations
+          # We check dist/client first, then .output/public, then dist
           if [ -d "dist/client" ] && [ -f "dist/client/index.html" ]; then
-            cp dist/client/index.html dist/client/404.html
-            echo "FINAL_PATH=dist/client" >> $GITHUB_ENV
-          elif [ -f "dist/index.html" ]; then
-            cp dist/index.html dist/404.html
-            echo "FINAL_PATH=dist" >> $GITHUB_ENV
+            echo "Found files in dist/client"
+            cp -r dist/client/* final_output/
+          elif [ -d ".output/public" ]; then
+            echo "Found files in .output/public"
+            cp -r .output/public/* final_output/
+          elif [ -d "dist" ] && [ -f "dist/index.html" ]; then
+            echo "Found files in dist"
+            cp -r dist/* final_output/
           else
-            # Emergency fallback to keep the 'Green' status
-            mkdir -p dist/client
-            echo "<html><body><h1>Deployment Syncing</h1><script>window.location.reload();</script></body></html>" > dist/client/index.html
-            echo "FINAL_PATH=dist/client" >> $GITHUB_ENV
+            echo "CRITICAL ERROR: No index.html found in any build folder!"
+            exit 1
           fi
+
+          # 4. Create the 404 fallback
+          cp final_output/index.html final_output/404.html
         env:
           VITE_LOVABLE_TAGGER: false
           CI: false
@@ -62,7 +70,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ env.FINAL_PATH }}
+          path: 'final_output'
 
       - name: Deploy to GitHub Pages
         id: deployment
