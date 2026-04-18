@@ -42,9 +42,15 @@ jobs:
       - name: Build project
         run: |
           bun run build
-          # We go directly to the folder instead of searching
-          # TanStack Start always outputs to .output/public
-          cp .output/public/index.html .output/public/404.html
+          # Based on your logs, the files are in dist/client
+          # We check if index.html exists there first
+          if [ -f "dist/client/index.html" ]; then
+            cp dist/client/index.html dist/client/404.html
+          else
+            echo "Searching for index.html..."
+            ACTUAL_PATH=$(find dist -name index.html | head -n 1)
+            cp "$ACTUAL_PATH" "$(dirname "$ACTUAL_PATH")/404.html"
+          fi
         env:
           VITE_LOVABLE_TAGGER: false
           CI: false
@@ -52,8 +58,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # This matches the folder TanStack actually creates
-          path: '.output/public'
+          # Pointing to the correct folder from your logs
+          path: 'dist/client'
 
       - name: Deploy to GitHub Pages
         id: deployment
