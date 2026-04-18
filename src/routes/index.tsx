@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowRight, Mouse, Quote, Users, Sparkles, Globe2, HeartHandshake } from "lucide-react";
+import { EditableText } from "@/components/EditableText";
+import { EditableImage } from "@/components/EditableImage";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -51,6 +53,41 @@ function Typewriter() {
   return <span className="cursor-blink text-primary">{text}</span>;
 }
 
+const PRINCIPLES = [
+  {
+    Icon: Users,
+    storageKey: "home.principle.1",
+    defaultTitle: "Student-Centered Learning",
+    defaultBody:
+      "Every student deserves personalized attention and teaching methods that cater to their unique learning styles and mathematical abilities.",
+    tone: "bg-[oklch(0.95_0.04_265)] text-primary",
+  },
+  {
+    Icon: HeartHandshake,
+    storageKey: "home.principle.2",
+    defaultTitle: "Collaborative Growth",
+    defaultBody:
+      "Mathematics is best learned through collaboration, peer discussion, and shared problem-solving experiences.",
+    tone: "bg-[oklch(0.95_0.04_295)] text-[oklch(0.5_0.2_295)]",
+  },
+  {
+    Icon: Globe2,
+    storageKey: "home.principle.3",
+    defaultTitle: "Real-World Connections",
+    defaultBody:
+      "Mathematical concepts become meaningful when connected to real-life applications and everyday situations.",
+    tone: "bg-[oklch(0.95_0.04_150)] text-[oklch(0.45_0.18_150)]",
+  },
+  {
+    Icon: Sparkles,
+    storageKey: "home.principle.4",
+    defaultTitle: "Inclusive Excellence",
+    defaultBody:
+      "Creating an inclusive classroom where every student feels valued, supported, and capable of mathematical success.",
+    tone: "bg-[oklch(0.95_0.04_60)] text-[oklch(0.45_0.18_60)]",
+  },
+];
+
 function HomePage() {
   return (
     <div>
@@ -84,118 +121,130 @@ function HomePage() {
         </div>
       </section>
 
-      {/* PHILOSOPHY */}
+      {/* PHILOSOPHY — image left, text right */}
       <section id="philosophy" className="border-t border-border py-24">
-        <div className="mx-auto max-w-4xl px-6">
-          <p className="text-center text-xs font-semibold uppercase tracking-[0.25em] text-primary">
-            My Teaching Philosophy
-          </p>
-          <h2 className="mt-4 text-center font-display text-4xl font-bold text-foreground sm:text-5xl">
-            My Becoming of a <br className="hidden sm:block" />
-            <span className="text-primary">Student-Centered Teacher</span>
-          </h2>
-          <div className="mt-12 space-y-6 text-lg leading-relaxed text-muted-foreground">
-            <p>
-              Mathematics has always been more than just numbers and equations to me — it's a
-              universal language that unlocks critical thinking and problem-solving abilities in
-              every learner. As an aspiring educator, I believe my role extends far beyond teaching
-              formulas; I'm here to ignite curiosity and build confidence in every student who walks
-              into my classroom.
-            </p>
-            <p>
-              My journey into education stems from a deep conviction that every student can succeed
-              in mathematics with the right guidance, patience, and encouragement. I am committed to
-              creating inclusive learning environments where mistakes become stepping stones to
-              understanding, and where each student's unique perspective contributes to our
-              collective discovery of mathematical beauty.
-            </p>
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="grid items-center gap-12 lg:grid-cols-2">
+            <EditableImage
+              storageKey="home.philosophy.image"
+              alt="Portrait of the educator"
+              className="aspect-[4/5] w-full"
+              emptyLabel="Add your portrait"
+            />
+            <div>
+              <EditableText
+                storageKey="home.philosophy.eyebrow"
+                defaultValue="My Teaching Philosophy"
+                placeholder="Eyebrow"
+                paragraphClassName="text-xs font-semibold uppercase tracking-[0.25em] text-primary"
+              />
+              <EditableText
+                storageKey="home.philosophy.heading"
+                defaultValue="My Becoming of a Student-Centered Teacher"
+                as="h2"
+                placeholder="Section heading"
+                paragraphClassName="mt-4 font-display text-4xl font-bold leading-tight text-foreground sm:text-5xl"
+              />
+              <EditableText
+                storageKey="home.philosophy.body"
+                multiline
+                defaultValue=""
+                placeholder="Share your teaching philosophy here"
+                className="mt-8"
+                paragraphClassName="mb-5 text-base leading-relaxed text-muted-foreground sm:text-lg"
+              />
+              <figure className="mt-8 rounded-2xl border border-border bg-card p-6 shadow-card">
+                <Quote className="h-7 w-7 text-primary" />
+                <EditableText
+                  storageKey="home.philosophy.quote"
+                  defaultValue=""
+                  placeholder="Add your guiding quote"
+                  as="p"
+                  paragraphClassName="mt-3 font-display text-xl italic leading-snug text-foreground sm:text-2xl"
+                />
+              </figure>
+            </div>
           </div>
-          <figure className="mt-12 rounded-2xl border border-border bg-card p-8 shadow-card">
-            <Quote className="h-8 w-8 text-primary" />
-            <blockquote className="mt-4 font-display text-2xl italic leading-snug text-foreground sm:text-3xl">
-              "To teach mathematics is to open minds to endless possibilities."
-            </blockquote>
-          </figure>
         </div>
       </section>
 
       {/* ABOUT PORTFOLIO */}
       <section className="bg-muted/40 py-24">
-        <div className="mx-auto max-w-4xl px-6">
-          <p className="text-center text-xs font-semibold uppercase tracking-[0.25em] text-primary">
-            About This Portfolio
-          </p>
-          <h2 className="mt-4 text-center font-display text-4xl font-bold text-foreground sm:text-5xl">
-            Purpose of This Portfolio
-          </h2>
-          <div className="mt-10 space-y-6 text-lg leading-relaxed text-muted-foreground">
-            <p>
-              This developmental portfolio serves as a comprehensive documentation of my journey
-              through the first year of my education program. It showcases my growth across five
-              institutional outcomes and sixteen specific indicators of teaching competence.
-            </p>
-            <p>
-              Through carefully selected artifacts, reflections, and assessments, this portfolio
-              demonstrates my evolving understanding of effective mathematics instruction, my
-              commitment to student-centered learning, and my dedication to continuous professional
-              growth. It is both a celebration of achievements and an honest acknowledgment of areas
-              where I continue to develop.
-            </p>
-          </div>
+        <div className="mx-auto max-w-4xl px-6 text-center">
+          <EditableText
+            storageKey="home.purpose.eyebrow"
+            defaultValue="About This Portfolio"
+            placeholder="Eyebrow"
+            paragraphClassName="text-xs font-semibold uppercase tracking-[0.25em] text-primary"
+          />
+          <EditableText
+            storageKey="home.purpose.heading"
+            defaultValue="Purpose of This Portfolio"
+            as="h2"
+            placeholder="Section heading"
+            paragraphClassName="mt-4 font-display text-4xl font-bold text-foreground sm:text-5xl"
+          />
+          <EditableText
+            storageKey="home.purpose.body"
+            multiline
+            defaultValue=""
+            placeholder="Describe the purpose of this portfolio"
+            className="mt-10 text-left"
+            paragraphClassName="mb-5 text-base leading-relaxed text-muted-foreground sm:text-lg"
+          />
         </div>
       </section>
 
-      {/* PRINCIPLES */}
+      {/* CORE BELIEFS */}
       <section className="py-24">
         <div className="mx-auto max-w-6xl px-6">
-          <p className="text-center text-xs font-semibold uppercase tracking-[0.25em] text-primary">
-            Core Beliefs
-          </p>
-          <h2 className="mt-4 text-center font-display text-4xl font-bold text-foreground sm:text-5xl">
-            My Emerging Educational <br className="hidden sm:block" />
-            <span className="text-primary">Guiding Principles</span>
-          </h2>
-          <p className="mx-auto mt-6 max-w-2xl text-center text-muted-foreground">
-            These principles guide my approach to teaching mathematics and shape every decision I
-            make in the classroom.
-          </p>
+          <div className="text-center">
+            <EditableText
+              storageKey="home.beliefs.eyebrow"
+              defaultValue="Core Beliefs"
+              placeholder="Eyebrow"
+              paragraphClassName="text-xs font-semibold uppercase tracking-[0.25em] text-primary"
+            />
+            <EditableText
+              storageKey="home.beliefs.heading"
+              defaultValue="My Emerging Educational Guiding Principles"
+              as="h2"
+              placeholder="Section heading"
+              paragraphClassName="mt-4 font-display text-4xl font-bold text-foreground sm:text-5xl"
+            />
+            <EditableText
+              storageKey="home.beliefs.intro"
+              defaultValue=""
+              placeholder="Add an introduction for your core beliefs"
+              className="mx-auto mt-6 max-w-2xl"
+              paragraphClassName="text-base text-muted-foreground"
+            />
+          </div>
 
           <div className="mt-16 grid gap-6 sm:grid-cols-2">
-            {[
-              {
-                Icon: Users,
-                title: "Student-Centered Learning",
-                body: "Every student deserves personalized attention and teaching methods that cater to their unique learning styles and mathematical abilities.",
-                tone: "bg-[oklch(0.95_0.04_265)] text-primary",
-              },
-              {
-                Icon: HeartHandshake,
-                title: "Collaborative Growth",
-                body: "Mathematics is best learned through collaboration, peer discussion, and shared problem-solving experiences.",
-                tone: "bg-[oklch(0.95_0.04_295)] text-[oklch(0.5_0.2_295)]",
-              },
-              {
-                Icon: Globe2,
-                title: "Real-World Connections",
-                body: "Mathematical concepts become meaningful when connected to real-life applications and everyday situations.",
-                tone: "bg-[oklch(0.95_0.04_150)] text-[oklch(0.45_0.18_150)]",
-              },
-              {
-                Icon: Sparkles,
-                title: "Inclusive Excellence",
-                body: "Creating an inclusive classroom where every student feels valued, supported, and capable of mathematical success.",
-                tone: "bg-[oklch(0.95_0.04_60)] text-[oklch(0.45_0.18_60)]",
-              },
-            ].map(({ Icon, title, body, tone }) => (
+            {PRINCIPLES.map(({ Icon, storageKey, defaultTitle, tone }) => (
               <div
-                key={title}
+                key={storageKey}
                 className="group rounded-2xl border border-border bg-card p-8 shadow-soft transition-all hover:-translate-y-1 hover:shadow-elevated"
               >
                 <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${tone}`}>
                   <Icon className="h-6 w-6" />
                 </div>
-                <h3 className="mt-5 font-display text-2xl font-semibold text-foreground">{title}</h3>
-                <p className="mt-3 leading-relaxed text-muted-foreground">{body}</p>
+                <EditableText
+                  storageKey={`${storageKey}.title`}
+                  defaultValue={defaultTitle}
+                  as="h3"
+                  placeholder="Belief title"
+                  paragraphClassName="mt-5 font-display text-2xl font-semibold text-foreground"
+                />
+                <EditableText
+                  storageKey={`${storageKey}.body`}
+                  defaultValue=""
+                  multiline
+                  placeholder="Describe this belief"
+                  className="mt-3"
+                  paragraphClassName="mb-3 leading-relaxed text-muted-foreground"
+                />
               </div>
             ))}
           </div>
@@ -204,47 +253,35 @@ function HomePage() {
 
       {/* RETROSPECTION */}
       <section className="bg-muted/40 py-24">
-        <div className="mx-auto max-w-4xl px-6">
-          <p className="text-center text-xs font-semibold uppercase tracking-[0.25em] text-primary">
-            Reflection
-          </p>
-          <h2 className="mt-4 text-center font-display text-4xl font-bold text-foreground sm:text-5xl">
-            Overall Retrospection
-          </h2>
-          <p className="mt-4 text-center text-muted-foreground">
-            Reflecting on my first year of growth and learning
-          </p>
-
-          <div className="mt-12 space-y-6 text-base leading-relaxed text-muted-foreground sm:text-lg">
-            <p>
-              My first year in this developmental program has been transformative, challenging me to
-              grow both personally and professionally. I entered this program with a passion for
-              mathematics and a desire to teach, but I quickly learned that effective teaching
-              requires much more than content knowledge. Through coursework, field experiences, and
-              countless hours of reflection, I have developed a deeper understanding of what it
-              means to be an educator.
-            </p>
-            <p>
-              The self-assessment process revealed both my strengths and areas for continued growth.
-              I am proud of my ability to create inclusive learning environments where all students
-              feel valued and capable of mathematical success. However, I recognize that I need to
-              continue developing my assessment literacy, particularly in designing and implementing
-              formative assessments that truly inform my instruction.
-            </p>
-            <p>
-              The evidence I have collected throughout this year tells the story of my evolution as
-              a teacher. Each artifact represents not just a completed assignment, but a moment of
-              learning and growth. I have learned to embrace feedback as a gift rather than
-              criticism, and to view challenges as opportunities for growth rather than obstacles to
-              success.
-            </p>
-            <p>
-              Looking ahead to my second year and beyond, I am excited to continue developing as a
-              mathematics educator. I am committed to maintaining the reflective practice that has
-              been so central to my growth this year — becoming an excellent teacher is a lifelong
-              journey, and I am grateful for the strong foundation this first year has provided.
-            </p>
-          </div>
+        <div className="mx-auto max-w-4xl px-6 text-center">
+          <EditableText
+            storageKey="home.retro.eyebrow"
+            defaultValue="Reflection"
+            placeholder="Eyebrow"
+            paragraphClassName="text-xs font-semibold uppercase tracking-[0.25em] text-primary"
+          />
+          <EditableText
+            storageKey="home.retro.heading"
+            defaultValue="Overall Retrospection"
+            as="h2"
+            placeholder="Section heading"
+            paragraphClassName="mt-4 font-display text-4xl font-bold text-foreground sm:text-5xl"
+          />
+          <EditableText
+            storageKey="home.retro.subheading"
+            defaultValue="Reflecting on my first year of growth and learning"
+            placeholder="Section subheading"
+            className="mt-4"
+            paragraphClassName="text-muted-foreground"
+          />
+          <EditableText
+            storageKey="home.retro.body"
+            multiline
+            defaultValue=""
+            placeholder="Share your overall retrospection"
+            className="mt-12 text-left"
+            paragraphClassName="mb-6 text-base leading-relaxed text-muted-foreground sm:text-lg"
+          />
         </div>
       </section>
 

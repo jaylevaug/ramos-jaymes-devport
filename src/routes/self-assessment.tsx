@@ -1,6 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ShieldCheck, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { indicators, ratingScale } from "@/data/portfolio";
+import { useAuth } from "@/lib/auth";
+import { useLocalStorage } from "@/lib/storage";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/self-assessment")({
   head: () => ({
@@ -21,8 +24,17 @@ export const Route = createFileRoute("/self-assessment")({
   component: SelfAssessmentPage,
 });
 
+type Scores = Record<string, number | null>;
+
 function SelfAssessmentPage() {
+  const { isAdmin } = useAuth();
   const totalSubs = indicators.reduce((acc, i) => acc + i.subs.length, 0);
+  const [scores, setScores] = useLocalStorage<Scores>("portfolio.scores", {});
+  const ratedCount = Object.values(scores).filter((v) => typeof v === "number").length;
+
+  const setScore = (code: string, value: number | null) => {
+    setScores((prev) => ({ ...prev, [code]: value }));
+  };
 
   return (
     <div>
@@ -46,12 +58,14 @@ function SelfAssessmentPage() {
       <div className="border-b border-border bg-card">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-5">
           <p className="text-sm">
-            <span className="text-2xl font-semibold text-foreground">0</span>
+            <span className="text-2xl font-semibold text-foreground">{ratedCount}</span>
             <span className="text-muted-foreground"> / {totalSubs} rated</span>
           </p>
-          <button className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent">
-            <ShieldCheck className="h-4 w-4" /> Admin Login
-          </button>
+          {isAdmin && (
+            <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+              Admin mode — click a score to edit
+            </span>
+          )}
         </div>
       </div>
 
@@ -74,46 +88,60 @@ function SelfAssessmentPage() {
                     <th className="w-56 px-6 py-4">Indicator</th>
                     <th className="w-20 px-3 py-4">Code</th>
                     <th className="px-6 py-4">Sub-Indicator</th>
-                    <th className="w-24 px-6 py-4 text-center">Score</th>
+                    <th className="w-32 px-6 py-4 text-center">Score</th>
                   </tr>
                 </thead>
                 <tbody>
                   {indicators.map((ind) =>
-                    ind.subs.map((sub, idx) => (
-                      <tr
-                        key={sub.code}
-                        className="border-t border-border align-top transition-colors hover:bg-muted/30"
-                      >
-                        {idx === 0 && (
-                          <td
-                            rowSpan={ind.subs.length}
-                            className="border-r border-border px-6 py-5 align-top"
-                          >
-                            <div className="flex items-start gap-3">
-                              <span
-                                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-sm font-bold text-white ${ind.badgeColor}`}
-                              >
-                                {ind.id}
-                              </span>
-                              <span className="font-semibold leading-snug text-foreground">
-                                {ind.name}
-                              </span>
-                            </div>
+                    ind.subs.map((sub, idx) => {
+                      const current = scores[sub.code] ?? null;
+                      return (
+                        <tr
+                          key={sub.code}
+                          className="border-t border-border align-top transition-colors hover:bg-muted/30"
+                        >
+                          {idx === 0 && (
+                            <td
+                              rowSpan={ind.subs.length}
+                              className="border-r border-border px-6 py-5 align-top"
+                            >
+                              <div className="flex items-start gap-3">
+                                <span
+                                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-sm font-bold text-white ${ind.badgeColor}`}
+                                >
+                                  {ind.id}
+                                </span>
+                                <span className="font-semibold leading-snug text-foreground">
+                                  {ind.name}
+                                </span>
+                              </div>
+                            </td>
+                          )}
+                          <td className="px-3 py-5">
+                            <span className="inline-flex items-center justify-center rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+                              {sub.code}
+                            </span>
                           </td>
-                        )}
-                        <td className="px-3 py-5">
-                          <span className="inline-flex items-center justify-center rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
-                            {sub.code}
-                          </span>
-                        </td>
-                        <td className="px-6 py-5 leading-relaxed text-muted-foreground">
-                          {sub.text}
-                        </td>
-                        <td className="px-6 py-5 text-center text-2xl font-light text-muted-foreground/40">
-                          —
-                        </td>
-                      </tr>
-                    )),
+                          <td className="px-6 py-5 leading-relaxed text-muted-foreground">
+                            {sub.text}
+                          </td>
+                          <td className="px-6 py-5 text-center">
+                            {isAdmin ? (
+                              <ScorePicker
+                                value={current}
+                                onChange={(v) => setScore(sub.code, v)}
+                              />
+                            ) : current === null ? (
+                              <span className="text-2xl font-light text-muted-foreground/40">—</span>
+                            ) : (
+                              <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary text-base font-bold text-primary-foreground shadow-soft">
+                                {current}
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    }),
                   )}
                 </tbody>
               </table>
@@ -147,26 +175,8 @@ function SelfAssessmentPage() {
         </div>
       </section>
 
-      {/* STRENGTHS & GROWTH */}
-      <section className="py-20">
-        <div className="mx-auto grid max-w-6xl gap-6 px-6 md:grid-cols-2">
-          <div className="rounded-2xl border border-border bg-card p-8 shadow-card">
-            <h3 className="font-display text-2xl font-semibold text-foreground">
-              Perceived Strengths
-            </h3>
-            <p className="mt-4 text-muted-foreground">No items added yet.</p>
-          </div>
-          <div className="rounded-2xl border border-border bg-card p-8 shadow-card">
-            <h3 className="font-display text-2xl font-semibold text-foreground">
-              Areas for Growth
-            </h3>
-            <p className="mt-4 text-muted-foreground">No items added yet.</p>
-          </div>
-        </div>
-      </section>
-
       {/* CTA */}
-      <section className="bg-muted/40 py-20">
+      <section className="py-20">
         <div className="mx-auto max-w-3xl px-6 text-center">
           <h2 className="font-display text-4xl font-bold text-foreground">Explore the Evidence</h2>
           <p className="mt-4 text-muted-foreground">
@@ -180,6 +190,34 @@ function SelfAssessmentPage() {
           </Link>
         </div>
       </section>
+    </div>
+  );
+}
+
+function ScorePicker({
+  value,
+  onChange,
+}: {
+  value: number | null;
+  onChange: (v: number | null) => void;
+}) {
+  return (
+    <div className="inline-flex items-center gap-1">
+      {[1, 2, 3, 4].map((n) => (
+        <button
+          key={n}
+          onClick={() => onChange(value === n ? null : n)}
+          className={cn(
+            "h-8 w-8 rounded-full border text-sm font-semibold transition-all",
+            value === n
+              ? "border-primary bg-primary text-primary-foreground shadow-soft"
+              : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground",
+          )}
+          aria-label={`Set score ${n}`}
+        >
+          {n}
+        </button>
+      ))}
     </div>
   );
 }
