@@ -9,8 +9,20 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SelfAssessmentRouteImport } from './routes/self-assessment'
+import { Route as EvidenceReflectionsRouteImport } from './routes/evidence-reflections'
 import { Route as IndexRouteImport } from './routes/index'
 
+const SelfAssessmentRoute = SelfAssessmentRouteImport.update({
+  id: '/self-assessment',
+  path: '/self-assessment',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EvidenceReflectionsRoute = EvidenceReflectionsRouteImport.update({
+  id: '/evidence-reflections',
+  path: '/evidence-reflections',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -19,28 +31,50 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/evidence-reflections': typeof EvidenceReflectionsRoute
+  '/self-assessment': typeof SelfAssessmentRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/evidence-reflections': typeof EvidenceReflectionsRoute
+  '/self-assessment': typeof SelfAssessmentRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/evidence-reflections': typeof EvidenceReflectionsRoute
+  '/self-assessment': typeof SelfAssessmentRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/evidence-reflections' | '/self-assessment'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/evidence-reflections' | '/self-assessment'
+  id: '__root__' | '/' | '/evidence-reflections' | '/self-assessment'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  EvidenceReflectionsRoute: typeof EvidenceReflectionsRoute
+  SelfAssessmentRoute: typeof SelfAssessmentRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/self-assessment': {
+      id: '/self-assessment'
+      path: '/self-assessment'
+      fullPath: '/self-assessment'
+      preLoaderRoute: typeof SelfAssessmentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/evidence-reflections': {
+      id: '/evidence-reflections'
+      path: '/evidence-reflections'
+      fullPath: '/evidence-reflections'
+      preLoaderRoute: typeof EvidenceReflectionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -53,7 +87,18 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  EvidenceReflectionsRoute: EvidenceReflectionsRoute,
+  SelfAssessmentRoute: SelfAssessmentRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
