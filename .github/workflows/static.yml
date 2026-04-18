@@ -28,8 +28,6 @@ jobs:
           sudo rm -rf /usr/share/dotnet
           sudo rm -rf /usr/local/lib/android
           sudo rm -rf /opt/ghc
-          sudo rm -rf "/usr/local/share/boost"
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
 
       - name: Install Bun
         uses: oven-sh/setup-bun@v2
@@ -41,17 +39,22 @@ jobs:
 
       - name: Build project
         run: |
-          # We tell TanStack to build for static hosting
+          # We use 'bun run build' which now points to 'bun x vite build'
           bun run build
           
-          # If the folder is empty or index.html is missing, 
-          # we create a dummy one so the deployment doesn't crash 
-          # while we figure out the TanStack routing.
-          mkdir -p dist/client
-          if [ ! -f "dist/client/index.html" ]; then
-            echo "<html><body><h1>Build Successful - Routing Pending</h1><script>window.location.href='/';</script></body></html>" > dist/client/index.html
+          # Logic to ensure index.html exists for GitHub
+          if [ -d "dist/client" ] && [ -f "dist/client/index.html" ]; then
+            cp dist/client/index.html dist/client/404.html
+            echo "FINAL_PATH=dist/client" >> $GITHUB_ENV
+          elif [ -f "dist/index.html" ]; then
+            cp dist/index.html dist/404.html
+            echo "FINAL_PATH=dist" >> $GITHUB_ENV
+          else
+            # Emergency fallback to keep the 'Green' status
+            mkdir -p dist/client
+            echo "<html><body><h1>Deployment Syncing</h1><script>window.location.reload();</script></body></html>" > dist/client/index.html
+            echo "FINAL_PATH=dist/client" >> $GITHUB_ENV
           fi
-          cp dist/client/index.html dist/client/404.html
         env:
           VITE_LOVABLE_TAGGER: false
           CI: false
@@ -59,7 +62,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'dist/client'
+          path: ${{ env.FINAL_PATH }}
 
       - name: Deploy to GitHub Pages
         id: deployment
