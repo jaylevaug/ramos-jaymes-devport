@@ -31,12 +31,15 @@ jobs:
         with:
           bun-version: latest
 
-      - name: Install and Build
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build project
         run: |
-          bun install
+          # We force TanStack to build a static site
           bun run build
-          # This copies index.html to 404.html to fix routing issues
-          cp dist/index.html dist/404.html
+        env:
+          VITE_LOVABLE_TAGGER: false
 
       - name: Setup Pages
         uses: actions/configure-pages@v6
@@ -44,7 +47,9 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          path: './dist'
+          # IMPORTANT: TanStack Start often puts static files in .output/public
+          # If this fails, we will try './dist' next.
+          path: './.output/public'
 
       - name: Deploy to GitHub Pages
         id: deployment
