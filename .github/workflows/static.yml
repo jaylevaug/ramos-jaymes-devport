@@ -37,9 +37,18 @@ jobs:
       - name: Build project
         run: |
           bun run build
-          # TanStack Start puts files in .output/public
-          # We make a copy of index.html called 404.html to fix routing
-          cp .output/public/index.html .output/public/404.html || echo "No index found"
+          # This part finds where the build folder is and names it 'deploy_me'
+          if [ -d ".output/public" ]; then
+            mv .output/public deploy_me
+          elif [ -d "dist" ]; then
+            mv dist deploy_me
+          else
+            # If standard folders aren't found, search for where index.html is
+            BUILD_DIR=$(find . -name index.html -not -path "./node_modules/*" -not -path "./src/*" | head -n 1 | xargs dirname)
+            cp -r $BUILD_DIR deploy_me
+          fi
+          # Create the 404 fallback
+          cp deploy_me/index.html deploy_me/404.html
         env:
           VITE_LOVABLE_TAGGER: false
           CI: false
@@ -47,8 +56,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # THIS IS THE KEY CHANGE:
-          path: '.output/public'
+          path: 'deploy_me'
 
       - name: Deploy to GitHub Pages
         id: deployment
