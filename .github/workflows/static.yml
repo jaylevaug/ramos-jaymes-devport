@@ -13,6 +13,9 @@ concurrency:
   group: "pages"
   cancel-in-progress: false
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   deploy:
     environment:
@@ -34,19 +37,18 @@ jobs:
       - name: Build project
         run: |
           bun run build
-          # Create fallback for routing
-          cp dist/index.html dist/404.html || echo "Using dist folder"
+          # TanStack Start puts files in .output/public
+          # We make a copy of index.html called 404.html to fix routing
+          cp .output/public/index.html .output/public/404.html || echo "No index found"
         env:
           VITE_LOVABLE_TAGGER: false
           CI: false
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './dist'
+          # THIS IS THE KEY CHANGE:
+          path: '.output/public'
 
       - name: Deploy to GitHub Pages
         id: deployment
