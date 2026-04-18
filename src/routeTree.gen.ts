@@ -10,12 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SelfAssessmentRouteImport } from './routes/self-assessment'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as EvidenceReflectionsRouteImport } from './routes/evidence-reflections'
 import { Route as IndexRouteImport } from './routes/index'
 
 const SelfAssessmentRoute = SelfAssessmentRouteImport.update({
   id: '/self-assessment',
   path: '/self-assessment',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EvidenceReflectionsRoute = EvidenceReflectionsRouteImport.update({
@@ -32,30 +38,34 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/evidence-reflections': typeof EvidenceReflectionsRoute
+  '/login': typeof LoginRoute
   '/self-assessment': typeof SelfAssessmentRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/evidence-reflections': typeof EvidenceReflectionsRoute
+  '/login': typeof LoginRoute
   '/self-assessment': typeof SelfAssessmentRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/evidence-reflections': typeof EvidenceReflectionsRoute
+  '/login': typeof LoginRoute
   '/self-assessment': typeof SelfAssessmentRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/evidence-reflections' | '/self-assessment'
+  fullPaths: '/' | '/evidence-reflections' | '/login' | '/self-assessment'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/evidence-reflections' | '/self-assessment'
-  id: '__root__' | '/' | '/evidence-reflections' | '/self-assessment'
+  to: '/' | '/evidence-reflections' | '/login' | '/self-assessment'
+  id: '__root__' | '/' | '/evidence-reflections' | '/login' | '/self-assessment'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   EvidenceReflectionsRoute: typeof EvidenceReflectionsRoute
+  LoginRoute: typeof LoginRoute
   SelfAssessmentRoute: typeof SelfAssessmentRoute
 }
 
@@ -66,6 +76,13 @@ declare module '@tanstack/react-router' {
       path: '/self-assessment'
       fullPath: '/self-assessment'
       preLoaderRoute: typeof SelfAssessmentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/evidence-reflections': {
@@ -88,6 +105,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   EvidenceReflectionsRoute: EvidenceReflectionsRoute,
+  LoginRoute: LoginRoute,
   SelfAssessmentRoute: SelfAssessmentRoute,
 }
 export const routeTree = rootRouteImport
