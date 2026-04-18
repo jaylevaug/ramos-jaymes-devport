@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Install Bun
         uses: oven-sh/setup-bun@v2
@@ -37,19 +37,29 @@ jobs:
       - name: Build project
         run: |
           bun run build
-          cp dist/index.html dist/404.html || echo "No dist folder yet"
+          # We check which folder exists and make sure index.html is there
+          if [ -d ".output/public" ]; then
+            cp .output/public/index.html .output/public/404.html || true
+            echo "DEPLOY_PATH=.output/public" >> $GITHUB_ENV
+          elif [ -d "dist" ]; then
+            cp dist/index.html dist/404.html || true
+            echo "DEPLOY_PATH=dist" >> $GITHUB_ENV
+          else
+            echo "No build folder found!"
+            exit 1
+          fi
         env:
           VITE_LOVABLE_TAGGER: false
           CI: false
 
       - name: Setup Pages
-        uses: actions/configure-pages@v6
+        uses: actions/configure-pages@v4
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v5
+        uses: actions/upload-pages-artifact@v3
         with:
-          path: './dist'
+          path: ${{ env.DEPLOY_PATH }}
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v5
+        uses: actions/deploy-pages@v4
