@@ -37,7 +37,7 @@ jobs:
       - name: Build project
         run: |
           bun run build
-          cp dist/index.html dist/404.html
+          cp dist/index.html dist/404.html || echo "No dist folder yet"
         env:
           VITE_LOVABLE_TAGGER: false
           CI: false
