@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Pencil, Check, X } from "lucide-react";
 import { useAuth } from "@/lib/auth";
-import { useLocalStorage } from "@/lib/storage";
+import { useCloudText } from "@/lib/storage";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -10,7 +10,6 @@ type Props = {
   multiline?: boolean;
   placeholder?: string;
   className?: string;
-  /** Render the value inside a wrapper. Each paragraph (split on blank line) becomes its own element. */
   as?: "h1" | "h2" | "h3" | "p" | "span" | "div";
   paragraphClassName?: string;
 };
@@ -25,7 +24,7 @@ export function EditableText({
   paragraphClassName,
 }: Props) {
   const { isAdmin } = useAuth();
-  const [stored, setStored, hydrated] = useLocalStorage<string>(storageKey, defaultValue);
+  const { value: stored, save, hydrated } = useCloudText(storageKey, defaultValue);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState("");
   const taRef = useRef<HTMLTextAreaElement | null>(null);
@@ -68,8 +67,8 @@ export function EditableText({
             <X className="h-3.5 w-3.5" /> Cancel
           </button>
           <button
-            onClick={() => {
-              setStored(draft);
+            onClick={async () => {
+              await save(draft);
               setEditing(false);
             }}
             className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90"

@@ -1,14 +1,13 @@
 import { useRef, useState } from "react";
-import { ImagePlus, Trash2, Pencil } from "lucide-react";
+import { ImagePlus, Trash2, Pencil, Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
-import { useLocalStorage } from "@/lib/storage";
+import { useCloudImage } from "@/lib/storage";
 import { cn } from "@/lib/utils";
 
 type Props = {
   storageKey: string;
   alt: string;
   className?: string;
-  /** When the image is missing, show this label to admins. */
   emptyLabel?: string;
 };
 
@@ -19,36 +18,49 @@ export function EditableImage({
   emptyLabel = "Add a photo",
 }: Props) {
   const { isAdmin } = useAuth();
-  const [src, setSrc] = useLocalStorage<string>(storageKey, "");
+  const { url, upload, remove } = useCloudImage(storageKey);
   const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
   const fileRef = useRef<HTMLInputElement | null>(null);
 
-  const onPick = (file: File) => {
+  const onPick = async (file: File) => {
     setError(null);
     if (!file.type.startsWith("image/")) {
       setError("Please choose an image file.");
       return;
     }
-    if (file.size > 1.5 * 1024 * 1024) {
-      setError("Image too large for browser storage. Use < 1.5 MB.");
+    if (file.size > 10 * 1024 * 1024) {
+      setError("Image too large. Use < 10 MB.");
       return;
     }
-    const reader = new FileReader();
-    reader.onload = () => setSrc(String(reader.result));
-    reader.onerror = () => setError("Failed to read file.");
-    reader.readAsDataURL(file);
+    setBusy(true);
+    try {
+      await upload(file);
+    } catch (e) {
+      console.error(e);
+      setError("Upload failed. Please try again.");
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
-    <div className={cn("relative overflow-hidden rounded-3xl border border-border bg-muted shadow-card", className)}>
-      {src ? (
-        <img src={src} alt={alt} className="h-full w-full object-cover" />
+    <div
+      className={cn(
+        "relative overflow-hidden rounded-3xl border border-border bg-muted shadow-card",
+        className,
+      )}
+    >
+      {url ? (
+        <img src={url} alt={alt} className="h-full w-full object-cover" />
       ) : (
         <div className="flex h-full w-full flex-col items-center justify-center gap-3 bg-gradient-to-br from-muted to-accent p-8 text-center">
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-background/70 text-muted-foreground">
             <ImagePlus className="h-6 w-6" />
           </div>
-          <p className="text-sm text-muted-foreground">{isAdmin ? emptyLabel : "Photo coming soon"}</p>
+          <p className="text-sm text-muted-foreground">
+            {isAdmin ? emptyLabel : "Photo coming soon"}
+          </p>
         </div>
       )}
 
@@ -56,14 +68,21 @@ export function EditableImage({
         <div className="absolute right-3 top-3 flex gap-2">
           <button
             onClick={() => fileRef.current?.click()}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-background/95 text-foreground shadow-soft hover:bg-background"
-            aria-label={src ? "Change photo" : "Add photo"}
+            disabled={busy}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-background/95 text-foreground shadow-soft hover:bg-background disabled:opacity-50"
+            aria-label={url ? "Change photo" : "Add photo"}
           >
-            {src ? <Pencil className="h-4 w-4" /> : <ImagePlus className="h-4 w-4" />}
+            {busy ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : url ? (
+              <Pencil className="h-4 w-4" />
+            ) : (
+              <ImagePlus className="h-4 w-4" />
+            )}
           </button>
-          {src && (
+          {url && !busy && (
             <button
-              onClick={() => setSrc("")}
+              onClick={() => remove()}
               className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-background/95 text-destructive shadow-soft hover:bg-background"
               aria-label="Remove photo"
             >
