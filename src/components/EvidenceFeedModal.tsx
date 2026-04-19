@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { Heart, MessageCircle, Send, Trash2, Plus, X } from "lucide-react";
 import {
   Dialog,
@@ -8,16 +8,18 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { useAuth } from "@/lib/auth";
-import { useLocalStorage, getBrowserId, toDrivePreview } from "@/lib/storage";
+import { getBrowserId, toDrivePreview } from "@/lib/storage";
+import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
-type Comment = { id: string; name: string; text: string; ts: number };
+type Comment = { id: string; author: string; body: string; created_at: string };
 type Post = {
   id: string;
-  driveUrl: string;
+  media_url: string;
   caption: string;
-  ts: number;
-  likes: string[]; // browser ids
+  created_at: string;
+  likeCount: number;
+  liked: boolean;
   comments: Comment[];
 };
 
@@ -39,69 +41,112 @@ export function EvidenceFeedModal({
   cardClass,
 }: Props) {
   const { isAdmin } = useAuth();
-  const storageKey = `portfolio.posts.${subCode}`;
-  const [posts, setPosts] = useLocalStorage<Post[]>(storageKey, []);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [composerOpen, setComposerOpen] = useState(false);
   const [newUrl, setNewUrl] = useState("");
   const [newCaption, setNewCaption] = useState("");
   const browserId = useMemo(() => (open ? getBrowserId() : ""), [open]);
 
-  const addPost = () => {
-    if (!newUrl.trim()) return;
-    const post: Post = {
-      id: crypto.randomUUID(),
-      driveUrl: newUrl.trim(),
-      caption: newCaption.trim(),
-      ts: Date.now(),
-      likes: [],
-      comments: [],
+  const refresh = useCallback(async () => {
+    if (!browserId) return;
+    const { data: postRows } = await supabase
+      .from("posts")
+      .select("id, media_url, caption, created_at")
+      .eq("indicator_key", subCode)
+      .order("created_at", { ascending: false });
+
+    const ids = (postRows ?? []).map((p) => p.id);
+    if (ids.length === 0) {
+      setPosts([]);
+      return;
+    }
+
+    const [{ data: likes }, { data: comments }] = await Promise.all([
+      supabase.from("likes").select("post_id, browser_id").in("post_id", ids),
+      supabase
+        .from("comments")
+        .select("id, post_id, author, body, created_at")
+        .in("post_id", ids)
+        .order("created_at", { ascending: true }),
+    ]);
+
+    const likesByPost = new Map<string, { count: number; liked: boolean }>();
+    (likes ?? []).forEach((l) => {
+      const cur = likesByPost.get(l.post_id) ?? { count: 0, liked: false };
+      cur.count += 1;
+      if (l.browser_id === browserId) cur.liked = true;
+      likesByPost.set(l.post_id, cur);
+    });
+    const commentsByPost = new Map<string, Comment[]>();
+    (comments ?? []).forEach((c) => {
+      const arr = commentsByPost.get(c.post_id) ?? [];
+      arr.push({ id: c.id, author: c.author, body: c.body, created_at: c.created_at });
+      commentsByPost.set(c.post_id, arr);
+    });
+
+    setPosts(
+      (postRows ?? []).map((p) => ({
+        ...p,
+        likeCount: likesByPost.get(p.id)?.count ?? 0,
+        liked: likesByPost.get(p.id)?.liked ?? false,
+        comments: commentsByPost.get(p.id) ?? [],
+      })),
+    );
+  }, [subCode, browserId]);
+
+  useEffect(() => {
+    if (!open) return;
+    refresh();
+    const channel = supabase
+      .channel(`feed:${subCode}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "posts", filter: `indicator_key=eq.${subCode}` },
+        () => refresh(),
+      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "likes" }, () => refresh())
+      .on("postgres_changes", { event: "*", schema: "public", table: "comments" }, () => refresh())
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
     };
-    setPosts((p) => [post, ...p]);
+  }, [open, subCode, refresh]);
+
+  const addPost = async () => {
+    if (!newUrl.trim()) return;
+    const { error } = await supabase
+      .from("posts")
+      .insert({ indicator_key: subCode, media_url: newUrl.trim(), caption: newCaption.trim() });
+    if (error) {
+      console.error(error);
+      return;
+    }
     setNewUrl("");
     setNewCaption("");
     setComposerOpen(false);
   };
 
-  const deletePost = (id: string) => {
+  const deletePost = async (id: string) => {
     if (!confirm("Delete this post?")) return;
-    setPosts((p) => p.filter((x) => x.id !== id));
+    await supabase.from("posts").delete().eq("id", id);
   };
 
-  const toggleLike = (postId: string) => {
-    setPosts((p) =>
-      p.map((post) =>
-        post.id !== postId
-          ? post
-          : {
-              ...post,
-              likes: post.likes.includes(browserId)
-                ? post.likes.filter((b) => b !== browserId)
-                : [...post.likes, browserId],
-            },
-      ),
-    );
+  const toggleLike = async (postId: string, liked: boolean) => {
+    if (liked) {
+      await supabase.from("likes").delete().eq("post_id", postId).eq("browser_id", browserId);
+    } else {
+      await supabase.from("likes").insert({ post_id: postId, browser_id: browserId });
+    }
   };
 
-  const addComment = (postId: string, name: string, text: string) => {
-    const c: Comment = {
-      id: crypto.randomUUID(),
-      name: name.trim() || "Anonymous",
-      text: text.trim(),
-      ts: Date.now(),
-    };
-    setPosts((p) =>
-      p.map((post) => (post.id !== postId ? post : { ...post, comments: [...post.comments, c] })),
-    );
+  const addComment = async (postId: string, name: string, text: string) => {
+    await supabase
+      .from("comments")
+      .insert({ post_id: postId, author: name.trim() || "Anonymous", body: text.trim() });
   };
 
-  const deleteComment = (postId: string, commentId: string) => {
-    setPosts((p) =>
-      p.map((post) =>
-        post.id !== postId
-          ? post
-          : { ...post, comments: post.comments.filter((c) => c.id !== commentId) },
-      ),
-    );
+  const deleteComment = async (commentId: string) => {
+    await supabase.from("comments").delete().eq("id", commentId);
   };
 
   return (
@@ -200,11 +245,10 @@ export function EvidenceFeedModal({
                   key={post.id}
                   post={post}
                   isAdmin={isAdmin}
-                  liked={post.likes.includes(browserId)}
-                  onToggleLike={() => toggleLike(post.id)}
+                  onToggleLike={() => toggleLike(post.id, post.liked)}
                   onDelete={() => deletePost(post.id)}
                   onAddComment={(name, text) => addComment(post.id, name, text)}
-                  onDeleteComment={(commentId) => deleteComment(post.id, commentId)}
+                  onDeleteComment={(commentId) => deleteComment(commentId)}
                 />
               ))}
             </ul>
@@ -218,7 +262,6 @@ export function EvidenceFeedModal({
 function PostCard({
   post,
   isAdmin,
-  liked,
   onToggleLike,
   onDelete,
   onAddComment,
@@ -226,7 +269,6 @@ function PostCard({
 }: {
   post: Post;
   isAdmin: boolean;
-  liked: boolean;
   onToggleLike: () => void;
   onDelete: () => void;
   onAddComment: (name: string, text: string) => void;
@@ -234,13 +276,13 @@ function PostCard({
 }) {
   const [name, setName] = useState("");
   const [text, setText] = useState("");
-  const embed = toDrivePreview(post.driveUrl);
+  const embed = toDrivePreview(post.media_url);
 
   return (
     <li className="bg-card">
       <div className="flex items-center justify-between px-4 py-3">
         <p className="text-xs text-muted-foreground">
-          {new Date(post.ts).toLocaleDateString(undefined, {
+          {new Date(post.created_at).toLocaleDateString(undefined, {
             year: "numeric",
             month: "short",
             day: "numeric",
@@ -275,16 +317,16 @@ function PostCard({
             onClick={onToggleLike}
             className={cn(
               "inline-flex items-center gap-1 text-sm transition-colors",
-              liked ? "text-destructive" : "text-foreground hover:text-destructive",
+              post.liked ? "text-destructive" : "text-foreground hover:text-destructive",
             )}
-            aria-label={liked ? "Unlike" : "Like"}
+            aria-label={post.liked ? "Unlike" : "Like"}
           >
-            <Heart className={cn("h-6 w-6", liked && "fill-current")} />
+            <Heart className={cn("h-6 w-6", post.liked && "fill-current")} />
           </button>
           <MessageCircle className="h-6 w-6 text-foreground" />
         </div>
         <p className="mt-2 text-sm font-semibold">
-          {post.likes.length} {post.likes.length === 1 ? "like" : "likes"}
+          {post.likeCount} {post.likeCount === 1 ? "like" : "likes"}
         </p>
         {post.caption && (
           <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-foreground">
@@ -293,14 +335,13 @@ function PostCard({
         )}
       </div>
 
-      {/* Comments */}
       <div className="border-t border-border px-4 py-3">
         {post.comments.length > 0 && (
           <ul className="mb-3 space-y-2">
             {post.comments.map((c) => (
               <li key={c.id} className="group flex items-start gap-2 text-sm">
-                <span className="font-semibold text-foreground">{c.name}</span>
-                <span className="flex-1 text-muted-foreground">{c.text}</span>
+                <span className="font-semibold text-foreground">{c.author}</span>
+                <span className="flex-1 text-muted-foreground">{c.body}</span>
                 {isAdmin && (
                   <button
                     onClick={() => onDeleteComment(c.id)}
