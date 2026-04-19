@@ -7,6 +7,7 @@ const links = [
   { to: "/", label: "Home" },
   { to: "/self-assessment", label: "Self-Assessment" },
   { to: "/evidence-reflections", label: "Evidence & Reflections" },
+  { to: "/retrospection", label: "Retrospection" },
 ] as const;
 
 export function SiteHeader() {

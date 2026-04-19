@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowRight, Mouse, Quote } from "lucide-react";
+import { ArrowRight, Quote } from "lucide-react";
 import { EditableText } from "@/components/EditableText";
 import { EditableImage } from "@/components/EditableImage";
 
@@ -102,10 +102,6 @@ function HomePage() {
           >
             Discover my journey <ArrowRight className="h-4 w-4" />
           </a>
-          <div className="mt-20 flex flex-col items-center gap-2 text-muted-foreground">
-            <span className="text-xs">Discover my journey</span>
-            <Mouse className="h-5 w-5 animate-bounce" />
-          </div>
         </div>
       </section>
 
@@ -233,40 +229,6 @@ function HomePage() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* RETROSPECTION */}
-      <section className="bg-muted/40 py-24">
-        <div className="mx-auto max-w-4xl px-6 text-center">
-          <EditableText
-            storageKey="home.retro.eyebrow"
-            defaultValue="Reflection"
-            placeholder="Eyebrow"
-            paragraphClassName="text-xs font-semibold uppercase tracking-[0.25em] text-primary"
-          />
-          <EditableText
-            storageKey="home.retro.heading"
-            defaultValue="Overall Retrospection"
-            as="h2"
-            placeholder="Section heading"
-            paragraphClassName="mt-4 font-display text-4xl font-bold text-foreground sm:text-5xl"
-          />
-          <EditableText
-            storageKey="home.retro.subheading"
-            defaultValue="Reflecting on my first year of growth and learning"
-            placeholder="Section subheading"
-            className="mt-4"
-            paragraphClassName="text-muted-foreground"
-          />
-          <EditableText
-            storageKey="home.retro.body"
-            multiline
-            defaultValue=""
-            placeholder="Share your overall retrospection"
-            className="mt-12 text-left"
-            paragraphClassName="mb-6 text-base leading-relaxed text-muted-foreground sm:text-lg"
-          />
         </div>
       </section>
 
