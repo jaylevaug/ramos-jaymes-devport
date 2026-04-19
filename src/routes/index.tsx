@@ -321,24 +321,13 @@ function BeliefsGrid() {
       </div>
 
       <Dialog open={isOpen} onOpenChange={(o) => !o && setOpenIndex(null)}>
-        <DialogContent
-          showCloseButton={false}
-          className="max-w-3xl overflow-hidden border-border bg-card p-0 sm:rounded-3xl"
-        >
+        <DialogContent className="max-w-3xl overflow-hidden border-border bg-card p-0 sm:rounded-3xl">
           {current && (
             <div className="animate-scale-in">
-              <div className="flex items-center justify-between border-b border-border px-4 py-3 sm:px-6">
+              <div className="border-b border-border px-4 py-3 sm:px-6">
                 <span className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
                   Core Belief {(openIndex ?? 0) + 1} / {PRINCIPLES.length}
                 </span>
-                <button
-                  type="button"
-                  onClick={() => setOpenIndex(null)}
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground"
-                  aria-label="Close"
-                >
-                  <X className="h-4 w-4" />
-                </button>
               </div>
               <BeliefZoomBody
                 key={current.storageKey}
