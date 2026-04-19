@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowRight, Quote } from "lucide-react";
+import { ArrowRight, Quote, Maximize2, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { EditableText } from "@/components/EditableText";
 import { EditableImage } from "@/components/EditableImage";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { useCloudText } from "@/lib/storage";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -205,30 +207,8 @@ function HomePage() {
             />
           </div>
 
-          <div className="mt-16 grid gap-6 sm:grid-cols-2">
-            {PRINCIPLES.map(({ storageKey, defaultTitle }) => (
-              <div
-                key={storageKey}
-                className="group rounded-2xl border border-border bg-card p-8 shadow-soft transition-all hover:-translate-y-1 hover:shadow-elevated"
-              >
-                <EditableText
-                  storageKey={`${storageKey}.title`}
-                  defaultValue={defaultTitle}
-                  as="h3"
-                  placeholder="Belief title"
-                  paragraphClassName="font-display text-2xl font-semibold text-foreground"
-                />
-                <EditableText
-                  storageKey={`${storageKey}.body`}
-                  defaultValue=""
-                  multiline
-                  placeholder="Describe this belief"
-                  className="mt-3"
-                  paragraphClassName="mb-3 leading-relaxed text-muted-foreground"
-                />
-              </div>
-            ))}
-          </div>
+          <BeliefsGrid />
+
         </div>
       </section>
 
