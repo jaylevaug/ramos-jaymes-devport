@@ -14,7 +14,142 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      comments: {
+        Row: {
+          author: string
+          body: string
+          created_at: string
+          id: string
+          post_id: string
+        }
+        Insert: {
+          author: string
+          body: string
+          created_at?: string
+          id?: string
+          post_id: string
+        }
+        Update: {
+          author?: string
+          body?: string
+          created_at?: string
+          id?: string
+          post_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      likes: {
+        Row: {
+          browser_id: string
+          created_at: string
+          post_id: string
+        }
+        Insert: {
+          browser_id: string
+          created_at?: string
+          post_id: string
+        }
+        Update: {
+          browser_id?: string
+          created_at?: string
+          post_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      posts: {
+        Row: {
+          caption: string
+          created_at: string
+          id: string
+          indicator_key: string
+          media_url: string
+        }
+        Insert: {
+          caption?: string
+          created_at?: string
+          id?: string
+          indicator_key: string
+          media_url: string
+        }
+        Update: {
+          caption?: string
+          created_at?: string
+          id?: string
+          indicator_key?: string
+          media_url?: string
+        }
+        Relationships: []
+      }
+      scores: {
+        Row: {
+          indicator_key: string
+          updated_at: string
+          value: number
+        }
+        Insert: {
+          indicator_key: string
+          updated_at?: string
+          value: number
+        }
+        Update: {
+          indicator_key?: string
+          updated_at?: string
+          value?: number
+        }
+        Relationships: []
+      }
+      site_content: {
+        Row: {
+          key: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value?: string
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
+      site_images: {
+        Row: {
+          key: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
