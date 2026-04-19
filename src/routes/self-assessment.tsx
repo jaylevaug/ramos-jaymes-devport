@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { indicators, ratingScale } from "@/data/portfolio";
 import { useAuth } from "@/lib/auth";
-import { useLocalStorage } from "@/lib/storage";
+import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/self-assessment")({
@@ -29,11 +30,54 @@ type Scores = Record<string, number | null>;
 function SelfAssessmentPage() {
   const { isAdmin } = useAuth();
   const totalSubs = indicators.reduce((acc, i) => acc + i.subs.length, 0);
-  const [scores, setScores] = useLocalStorage<Scores>("portfolio.scores", {});
+  const [scores, setScores] = useState<Scores>({});
   const ratedCount = Object.values(scores).filter((v) => typeof v === "number").length;
 
-  const setScore = (code: string, value: number | null) => {
+  useEffect(() => {
+    let active = true;
+    supabase
+      .from("scores")
+      .select("indicator_key, value")
+      .then(({ data }) => {
+        if (!active) return;
+        const map: Scores = {};
+        (data ?? []).forEach((r) => {
+          map[r.indicator_key] = r.value;
+        });
+        setScores(map);
+      });
+
+    const channel = supabase
+      .channel("scores")
+      .on("postgres_changes", { event: "*", schema: "public", table: "scores" }, (payload) => {
+        const row = (payload.new ?? payload.old) as { indicator_key: string; value?: number } | null;
+        if (!row) return;
+        setScores((prev) => {
+          const next = { ...prev };
+          if (payload.eventType === "DELETE") delete next[row.indicator_key];
+          else next[row.indicator_key] = row.value ?? null;
+          return next;
+        });
+      })
+      .subscribe();
+    return () => {
+      active = false;
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const setScore = async (code: string, value: number | null) => {
     setScores((prev) => ({ ...prev, [code]: value }));
+    if (value === null) {
+      await supabase.from("scores").delete().eq("indicator_key", code);
+    } else {
+      await supabase
+        .from("scores")
+        .upsert(
+          { indicator_key: code, value, updated_at: new Date().toISOString() },
+          { onConflict: "indicator_key" },
+        );
+    }
   };
 
   return (
