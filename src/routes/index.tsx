@@ -1,10 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowRight, Quote, Maximize2, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowRight, Quote } from "lucide-react";
 import { EditableText } from "@/components/EditableText";
 import { EditableImage } from "@/components/EditableImage";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { useCloudText } from "@/lib/storage";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -207,8 +205,30 @@ function HomePage() {
             />
           </div>
 
-          <BeliefsGrid />
-
+          <div className="mt-16 grid gap-6 sm:grid-cols-2">
+            {PRINCIPLES.map(({ storageKey, defaultTitle }) => (
+              <div
+                key={storageKey}
+                className="group rounded-2xl border border-border bg-card p-8 shadow-soft transition-all hover:-translate-y-1 hover:shadow-elevated"
+              >
+                <EditableText
+                  storageKey={`${storageKey}.title`}
+                  defaultValue={defaultTitle}
+                  as="h3"
+                  placeholder="Belief title"
+                  paragraphClassName="font-display text-2xl font-semibold text-foreground"
+                />
+                <EditableText
+                  storageKey={`${storageKey}.body`}
+                  defaultValue=""
+                  multiline
+                  placeholder="Describe this belief"
+                  className="mt-3"
+                  paragraphClassName="mb-3 leading-relaxed text-muted-foreground"
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -241,120 +261,3 @@ function HomePage() {
     </div>
   );
 }
-
-function BeliefCardContent({ storageKey, defaultTitle }: { storageKey: string; defaultTitle: string }) {
-  return (
-    <>
-      <EditableText
-        storageKey={`${storageKey}.title`}
-        defaultValue={defaultTitle}
-        as="h3"
-        placeholder="Belief title"
-        paragraphClassName="font-display text-2xl font-semibold text-foreground"
-      />
-      <EditableText
-        storageKey={`${storageKey}.body`}
-        defaultValue=""
-        multiline
-        placeholder="Describe this belief"
-        className="mt-3"
-        paragraphClassName="mb-3 leading-relaxed text-muted-foreground"
-      />
-    </>
-  );
-}
-
-function BeliefZoomBody({ storageKey, defaultTitle }: { storageKey: string; defaultTitle: string }) {
-  const { value: title } = useCloudText(`${storageKey}.title`, defaultTitle);
-  const { value: body } = useCloudText(`${storageKey}.body`, "");
-  const paragraphs = body.split(/\n+/).filter((p) => p.trim().length > 0);
-  return (
-    <div className="px-2 py-4 sm:px-6 sm:py-6">
-      <h3 className="font-display text-3xl font-bold text-foreground sm:text-4xl">
-        {title || defaultTitle}
-      </h3>
-      <div className="mt-6 space-y-4">
-        {paragraphs.length > 0 ? (
-          paragraphs.map((p, i) => (
-            <p key={i} className="text-base leading-relaxed text-muted-foreground sm:text-lg">
-              {p}
-            </p>
-          ))
-        ) : (
-          <p className="text-base italic text-muted-foreground/70">No description yet.</p>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function BeliefsGrid() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const isOpen = openIndex !== null;
-  const current = openIndex !== null ? PRINCIPLES[openIndex] : null;
-
-  const next = () => setOpenIndex((i) => (i === null ? 0 : (i + 1) % PRINCIPLES.length));
-  const prev = () =>
-    setOpenIndex((i) =>
-      i === null ? 0 : (i - 1 + PRINCIPLES.length) % PRINCIPLES.length,
-    );
-
-  return (
-    <>
-      <div className="mt-16 grid gap-6 sm:grid-cols-2">
-        {PRINCIPLES.map((p, i) => (
-          <div
-            key={p.storageKey}
-            className="group relative rounded-2xl border border-border bg-card p-8 shadow-soft transition-all hover:-translate-y-1 hover:shadow-elevated"
-          >
-            <button
-              type="button"
-              onClick={() => setOpenIndex(i)}
-              aria-label={`Zoom into ${p.defaultTitle}`}
-              className="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background/80 text-muted-foreground opacity-70 backdrop-blur transition-all hover:scale-110 hover:bg-primary hover:text-primary-foreground hover:opacity-100"
-            >
-              <Maximize2 className="h-4 w-4" />
-            </button>
-            <BeliefCardContent storageKey={p.storageKey} defaultTitle={p.defaultTitle} />
-          </div>
-        ))}
-      </div>
-
-      <Dialog open={isOpen} onOpenChange={(o) => !o && setOpenIndex(null)}>
-        <DialogContent className="max-w-3xl overflow-hidden border-border bg-card p-0 sm:rounded-3xl">
-          {current && (
-            <div className="animate-scale-in">
-              <div className="border-b border-border px-4 py-3 sm:px-6">
-                <span className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
-                  Core Belief {(openIndex ?? 0) + 1} / {PRINCIPLES.length}
-                </span>
-              </div>
-              <BeliefZoomBody
-                key={current.storageKey}
-                storageKey={current.storageKey}
-                defaultTitle={current.defaultTitle}
-              />
-              <div className="flex items-center justify-between border-t border-border bg-muted/30 px-4 py-3 sm:px-6">
-                <button
-                  type="button"
-                  onClick={prev}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-4 py-2 text-sm font-semibold text-foreground transition-all hover:bg-accent"
-                >
-                  <ChevronLeft className="h-4 w-4" /> Previous
-                </button>
-                <button
-                  type="button"
-                  onClick={next}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-elevated transition-all hover:scale-[1.02] hover:bg-primary/90"
-                >
-                  Next belief <ChevronRight className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-    </>
-  );
-}
-
