@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowRight, Mouse, Quote, Users, Sparkles, Globe2, HeartHandshake } from "lucide-react";
+import { ArrowRight, Mouse, Quote } from "lucide-react";
 import { EditableText } from "@/components/EditableText";
 import { EditableImage } from "@/components/EditableImage";
 
@@ -55,35 +55,23 @@ function Typewriter() {
 
 const PRINCIPLES = [
   {
-    Icon: Users,
     storageKey: "home.principle.1",
     defaultTitle: "Student-Centered Learning",
-    defaultBody:
-      "Every student deserves personalized attention and teaching methods that cater to their unique learning styles and mathematical abilities.",
     tone: "bg-[oklch(0.95_0.04_265)] text-primary",
   },
   {
-    Icon: HeartHandshake,
     storageKey: "home.principle.2",
     defaultTitle: "Collaborative Growth",
-    defaultBody:
-      "Mathematics is best learned through collaboration, peer discussion, and shared problem-solving experiences.",
     tone: "bg-[oklch(0.95_0.04_295)] text-[oklch(0.5_0.2_295)]",
   },
   {
-    Icon: Globe2,
     storageKey: "home.principle.3",
     defaultTitle: "Real-World Connections",
-    defaultBody:
-      "Mathematical concepts become meaningful when connected to real-life applications and everyday situations.",
     tone: "bg-[oklch(0.95_0.04_150)] text-[oklch(0.45_0.18_150)]",
   },
   {
-    Icon: Sparkles,
     storageKey: "home.principle.4",
     defaultTitle: "Inclusive Excellence",
-    defaultBody:
-      "Creating an inclusive classroom where every student feels valued, supported, and capable of mathematical success.",
     tone: "bg-[oklch(0.95_0.04_60)] text-[oklch(0.45_0.18_60)]",
   },
 ];
@@ -222,20 +210,17 @@ function HomePage() {
           </div>
 
           <div className="mt-16 grid gap-6 sm:grid-cols-2">
-            {PRINCIPLES.map(({ Icon, storageKey, defaultTitle, tone }) => (
+            {PRINCIPLES.map(({ storageKey, defaultTitle }) => (
               <div
                 key={storageKey}
                 className="group rounded-2xl border border-border bg-card p-8 shadow-soft transition-all hover:-translate-y-1 hover:shadow-elevated"
               >
-                <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${tone}`}>
-                  <Icon className="h-6 w-6" />
-                </div>
                 <EditableText
                   storageKey={`${storageKey}.title`}
                   defaultValue={defaultTitle}
                   as="h3"
                   placeholder="Belief title"
-                  paragraphClassName="mt-5 font-display text-2xl font-semibold text-foreground"
+                  paragraphClassName="font-display text-2xl font-semibold text-foreground"
                 />
                 <EditableText
                   storageKey={`${storageKey}.body`}
