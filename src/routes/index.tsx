@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowRight, Quote, Maximize2, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ArrowRight, Quote, Maximize2, ChevronLeft, ChevronRight } from "lucide-react";
 import { EditableText } from "@/components/EditableText";
 import { EditableImage } from "@/components/EditableImage";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
