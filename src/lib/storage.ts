@@ -48,11 +48,28 @@ export function getBrowserId(): string {
   return id;
 }
 
+/** Extract the Google Drive file id from a share URL, if present. */
+export function getDriveFileId(url: string): string | null {
+  if (!url) return null;
+  const m = url.match(/\/file\/d\/([^/]+)/) || url.match(/[?&]id=([^&]+)/);
+  return m ? m[1] : null;
+}
+
 /** Convert a Google Drive share URL to an embeddable preview URL. */
 export function toDrivePreview(url: string): string {
-  if (!url) return "";
-  const m = url.match(/\/file\/d\/([^/]+)/) || url.match(/[?&]id=([^&]+)/);
-  if (m) return `https://drive.google.com/file/d/${m[1]}/preview`;
+  const id = getDriveFileId(url);
+  if (id) return `https://drive.google.com/file/d/${id}/preview`;
+  return url;
+}
+
+/**
+ * Lightweight Google Drive thumbnail image URL (works for images, videos,
+ * PDFs, docs, etc.). Much faster and lighter than the /preview iframe, and
+ * crucially does not steal focus/scroll the page while loading.
+ */
+export function toDriveThumbnail(url: string, size = 1000): string {
+  const id = getDriveFileId(url);
+  if (id) return `https://drive.google.com/thumbnail?id=${id}&sz=w${size}`;
   return url;
 }
 
