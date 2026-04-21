@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ImagePlus } from "lucide-react";
 import { indicators } from "@/data/portfolio";
 import { EvidenceFeedModal } from "@/components/EvidenceFeedModal";
-import { useLocalStorage } from "@/lib/storage";
+import { toDrivePreview } from "@/lib/storage";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/evidence-reflections")({
   head: () => ({
@@ -33,22 +34,69 @@ type Card = {
 };
 
 function CardThumb({ code, cardClass }: { code: string; cardClass: string }) {
-  // Peek at first post (if any) to show count instead of "No evidence yet"
-  const [posts] = useLocalStorage<Array<{ id: string }>>(`portfolio.posts.${code}`, []);
-  const count = posts.length;
+  const [count, setCount] = useState<number | null>(null);
+  const [latestUrl, setLatestUrl] = useState<string>("");
+
+  useEffect(() => {
+    let active = true;
+    const load = async () => {
+      const { data, count: c } = await supabase
+        .from("posts")
+        .select("media_url", { count: "exact" })
+        .eq("indicator_key", code)
+        .order("created_at", { ascending: false })
+        .limit(1);
+      if (!active) return;
+      setCount(c ?? 0);
+      setLatestUrl(data?.[0]?.media_url ?? "");
+    };
+    load();
+    const channel = supabase
+      .channel(`thumb:${code}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "posts", filter: `indicator_key=eq.${code}` },
+        () => load(),
+      )
+      .subscribe();
+    return () => {
+      active = false;
+      supabase.removeChannel(channel);
+    };
+  }, [code]);
+
+  const embed = latestUrl ? toDrivePreview(latestUrl) : "";
+  const hasPosts = (count ?? 0) > 0;
+
   return (
-    <div className={`relative flex aspect-[4/5] items-center justify-center ${cardClass}`}>
-      <span className="absolute left-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-white text-xs font-bold text-foreground shadow-soft">
+    <div className={`relative aspect-[4/5] overflow-hidden ${hasPosts ? "bg-black" : `flex items-center justify-center ${cardClass}`}`}>
+      <span className="absolute left-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white text-xs font-bold text-foreground shadow-soft">
         {code}
       </span>
-      <div className="flex flex-col items-center gap-3 text-white/95">
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-          <ImagePlus className="h-6 w-6" />
+      {hasPosts && embed ? (
+        <>
+          <iframe
+            src={embed}
+            title={`Latest evidence for ${code}`}
+            className="pointer-events-none absolute inset-0 h-full w-full"
+            allow="autoplay"
+          />
+          {count !== null && count > 1 && (
+            <span className="absolute bottom-3 right-3 z-10 rounded-full bg-black/70 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
+              {count} posts
+            </span>
+          )}
+        </>
+      ) : (
+        <div className="flex flex-col items-center gap-3 text-white/95">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+            <ImagePlus className="h-6 w-6" />
+          </div>
+          <span className="text-sm font-medium">
+            {count === null ? "Loading…" : "No evidence yet"}
+          </span>
         </div>
-        <span className="text-sm font-medium">
-          {count === 0 ? "No evidence yet" : `${count} post${count === 1 ? "" : "s"}`}
-        </span>
-      </div>
+      )}
     </div>
   );
 }
