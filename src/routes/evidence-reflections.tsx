@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ImagePlus } from "lucide-react";
 import { indicators } from "@/data/portfolio";
 import { EvidenceFeedModal } from "@/components/EvidenceFeedModal";
-import { toDrivePreview } from "@/lib/storage";
+import { toDriveThumbnail } from "@/lib/storage";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/evidence-reflections")({
