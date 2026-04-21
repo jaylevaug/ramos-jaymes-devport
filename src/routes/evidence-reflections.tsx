@@ -65,7 +65,7 @@ function CardThumb({ code, cardClass }: { code: string; cardClass: string }) {
     };
   }, [code]);
 
-  const embed = latestUrl ? toDrivePreview(latestUrl) : "";
+  const thumb = latestUrl ? toDriveThumbnail(latestUrl, 800) : "";
   const hasPosts = (count ?? 0) > 0;
 
   return (
@@ -73,13 +73,15 @@ function CardThumb({ code, cardClass }: { code: string; cardClass: string }) {
       <span className="absolute left-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white text-xs font-bold text-foreground shadow-soft">
         {code}
       </span>
-      {hasPosts && embed ? (
+      {hasPosts && thumb ? (
         <>
-          <iframe
-            src={embed}
-            title={`Latest evidence for ${code}`}
-            className="pointer-events-none absolute inset-0 h-full w-full"
-            allow="autoplay"
+          <img
+            src={thumb}
+            alt={`Latest evidence for ${code}`}
+            loading="lazy"
+            decoding="async"
+            referrerPolicy="no-referrer"
+            className="absolute inset-0 h-full w-full object-cover"
           />
           {count !== null && count > 1 && (
             <span className="absolute bottom-3 right-3 z-10 rounded-full bg-black/70 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
