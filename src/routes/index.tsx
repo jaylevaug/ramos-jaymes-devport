@@ -253,7 +253,13 @@ function HomePage() {
               to="/evidence-reflections"
               className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-7 py-3.5 text-sm font-semibold text-foreground shadow-soft transition-all hover:bg-accent"
             >
-              Evidence & Reflections <ArrowRight className="h-4 w-4" />
+              Explore my Evidences <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link
+              to="/retrospection"
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-7 py-3.5 text-sm font-semibold text-foreground shadow-soft transition-all hover:bg-accent"
+            >
+              Explore my Overall Reflection <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </div>

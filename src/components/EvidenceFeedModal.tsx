@@ -183,7 +183,7 @@ export function EvidenceFeedModal({
                 <div className="space-y-3 rounded-xl border border-border bg-card p-4">
                   <label className="block">
                     <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Google Drive share link (image or video)
+                      Google Drive share link (image, video, PDF, doc, etc.)
                     </span>
                     <input
                       value={newUrl}
