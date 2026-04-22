@@ -334,6 +334,7 @@ function EvidenceCard({
   const [name, setName] = useState("");
   const [text, setText] = useState("");
   const [showComments, setShowComments] = useState(false);
+  const [previewLoaded, setPreviewLoaded] = useState(false);
   const embed = toDrivePreview(evidence.media_url);
 
   return (
@@ -361,15 +362,21 @@ function EvidenceCard({
         )}
       </div>
 
-      <div className="aspect-square w-full bg-gradient-to-br from-muted to-muted/40">
+      <div className="relative aspect-square w-full bg-gradient-to-br from-muted to-muted/40">
         {embed ? (
-          <iframe
-            src={embed}
-            title={`Evidence ${evidence.id}`}
-            className="h-full w-full"
-            allow="autoplay"
-            allowFullScreen
-          />
+          <>
+            {!previewLoaded && (
+              <Skeleton className="absolute inset-0 h-full w-full rounded-none" />
+            )}
+            <iframe
+              src={embed}
+              title={`Evidence ${evidence.id}`}
+              onLoad={() => setPreviewLoaded(true)}
+              className={`h-full w-full transition-opacity duration-300 ${previewLoaded ? "opacity-100" : "opacity-0"}`}
+              allow="autoplay"
+              allowFullScreen
+            />
+          </>
         ) : null}
       </div>
 
