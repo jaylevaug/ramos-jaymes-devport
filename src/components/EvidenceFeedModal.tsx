@@ -164,6 +164,7 @@ export function EvidenceFeedModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[92vh] max-w-2xl overflow-hidden p-0 gap-0">
+        <TopProgressBar loading={loading} className="absolute" />
         <DialogHeader
           className={cn(
             "relative border-b border-border/50 p-6 pr-12 text-left text-white",
