@@ -5,6 +5,8 @@ import { indicators } from "@/data/portfolio";
 import { EvidenceFeedModal } from "@/components/EvidenceFeedModal";
 import { toDriveThumbnail } from "@/lib/storage";
 import { supabase } from "@/integrations/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton";
+import { TopProgressBar } from "@/components/TopProgressBar";
 
 export const Route = createFileRoute("/evidence-reflections")({
   head: () => ({
