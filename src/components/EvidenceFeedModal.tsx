@@ -104,8 +104,11 @@ export function EvidenceFeedModal({
   );
 
   useEffect(() => {
-    if (!open) return;
-    refresh();
+    if (!open) {
+      setLoading(true);
+      return;
+    }
+    refresh(true);
     const channel = supabase
       .channel(`feed:${subCode}`)
       .on(
