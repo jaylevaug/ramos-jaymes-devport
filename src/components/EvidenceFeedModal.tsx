@@ -253,7 +253,30 @@ export function EvidenceFeedModal({
             </div>
           )}
 
-          {evidences.length === 0 ? (
+          {loading ? (
+            <ul className="space-y-5 p-4 sm:p-5">
+              {Array.from({ length: 2 }).map((_, i) => (
+                <li
+                  key={i}
+                  className="overflow-hidden rounded-2xl border border-border bg-card shadow-soft"
+                >
+                  <div className="flex items-center justify-between border-b border-border/60 px-5 py-3">
+                    <Skeleton className="h-4 w-40" />
+                    <Skeleton className="h-8 w-8 rounded-full" />
+                  </div>
+                  <Skeleton className="aspect-square w-full rounded-none" />
+                  <div className="space-y-2 px-5 pt-4">
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
+                  </div>
+                  <div className="flex items-center gap-2 px-3 py-3">
+                    <Skeleton className="h-8 w-16 rounded-full" />
+                    <Skeleton className="h-8 w-16 rounded-full" />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : evidences.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-4 px-6 py-24 text-center">
               <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-muted to-muted/50 text-muted-foreground shadow-soft">
                 <Sparkles className="h-7 w-7" />
