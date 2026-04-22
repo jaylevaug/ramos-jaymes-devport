@@ -200,7 +200,7 @@ function EvidencePage() {
                 onClick={() => setActiveCard(c)}
                 className="group cursor-pointer overflow-hidden rounded-2xl border border-border bg-card text-left shadow-soft transition-all hover:-translate-y-1 hover:shadow-elevated focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               >
-                <CardThumb code={c.code} cardClass={c.cardClass} />
+                <CardThumb code={c.code} cardClass={c.cardClass} onLoadingChange={handleThumbLoading} />
                 <div className="p-5">
                   <span
                     className={`inline-block rounded-full px-3 py-1 text-xs font-semibold text-white ${c.cardClass}`}
