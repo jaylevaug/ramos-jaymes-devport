@@ -133,6 +133,7 @@ function CardThumb({
 function EvidencePage() {
   const [filter, setFilter] = useState<number | "all">("all");
   const [activeCard, setActiveCard] = useState<Card | null>(null);
+  const [loadingCount, setLoadingCount] = useState(0);
 
   const cards = useMemo<Card[]>(() => {
     return indicators.flatMap((ind) =>
@@ -149,8 +150,13 @@ function EvidencePage() {
   const visible = filter === "all" ? cards : cards.filter((c) => c.indicatorId === filter);
   const totalSubs = cards.length;
 
+  const handleThumbLoading = (loading: boolean) => {
+    setLoadingCount((n) => Math.max(0, n + (loading ? 1 : -1)));
+  };
+
   return (
     <div>
+      <TopProgressBar loading={loadingCount > 0} />
       {/* HERO */}
       <section className="bg-gradient-evidence py-20">
         <div className="mx-auto max-w-4xl px-6 text-center">
