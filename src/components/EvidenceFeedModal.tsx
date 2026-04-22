@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
-import { Heart, MessageCircle, Send, Trash2, Plus, X } from "lucide-react";
+import { Heart, MessageCircle, Send, Trash2, Plus, X, Sparkles, Calendar } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -13,7 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
 type Comment = { id: string; author: string; body: string; created_at: string };
-type Post = {
+type Evidence = {
   id: string;
   media_url: string;
   caption: string;
@@ -41,7 +41,7 @@ export function EvidenceFeedModal({
   cardClass,
 }: Props) {
   const { isAdmin } = useAuth();
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [evidences, setEvidences] = useState<Evidence[]>([]);
   const [composerOpen, setComposerOpen] = useState(false);
   const [newUrl, setNewUrl] = useState("");
   const [newCaption, setNewCaption] = useState("");
@@ -49,15 +49,15 @@ export function EvidenceFeedModal({
 
   const refresh = useCallback(async () => {
     if (!browserId) return;
-    const { data: postRows } = await supabase
+    const { data: rows } = await supabase
       .from("posts")
       .select("id, media_url, caption, created_at")
       .eq("indicator_key", subCode)
       .order("created_at", { ascending: false });
 
-    const ids = (postRows ?? []).map((p) => p.id);
+    const ids = (rows ?? []).map((p) => p.id);
     if (ids.length === 0) {
-      setPosts([]);
+      setEvidences([]);
       return;
     }
 
@@ -84,8 +84,8 @@ export function EvidenceFeedModal({
       commentsByPost.set(c.post_id, arr);
     });
 
-    setPosts(
-      (postRows ?? []).map((p) => ({
+    setEvidences(
+      (rows ?? []).map((p) => ({
         ...p,
         likeCount: likesByPost.get(p.id)?.count ?? 0,
         liked: likesByPost.get(p.id)?.liked ?? false,
@@ -112,7 +112,7 @@ export function EvidenceFeedModal({
     };
   }, [open, subCode, refresh]);
 
-  const addPost = async () => {
+  const addEvidence = async () => {
     if (!newUrl.trim()) return;
     const { error } = await supabase
       .from("posts")
@@ -126,8 +126,8 @@ export function EvidenceFeedModal({
     setComposerOpen(false);
   };
 
-  const deletePost = async (id: string) => {
-    if (!confirm("Delete this post?")) return;
+  const deleteEvidence = async (id: string) => {
+    if (!confirm("Delete this evidence?")) return;
     await supabase.from("posts").delete().eq("id", id);
   };
 
@@ -151,56 +151,69 @@ export function EvidenceFeedModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] max-w-2xl overflow-hidden p-0">
-        <DialogHeader className="border-b border-border p-5 pr-12 text-left">
-          <div className="flex items-center gap-3">
-            <span
-              className={cn(
-                "flex h-9 w-9 items-center justify-center rounded-full text-xs font-bold text-white",
-                cardClass,
-              )}
-            >
+      <DialogContent className="max-h-[92vh] max-w-2xl overflow-hidden p-0 gap-0">
+        <DialogHeader
+          className={cn(
+            "relative border-b border-border/50 p-6 pr-12 text-left text-white",
+            cardClass,
+          )}
+        >
+          <div className="absolute inset-0 bg-gradient-to-br from-black/10 to-black/30" />
+          <div className="relative flex items-center gap-4">
+            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/95 text-sm font-bold text-foreground shadow-lg">
               {subCode}
             </span>
-            <div>
-              <DialogTitle className="font-display text-lg">{indicatorShort}</DialogTitle>
-              <DialogDescription className="line-clamp-2 text-xs">{subText}</DialogDescription>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-semibold uppercase tracking-widest text-white/80">
+                {indicatorShort}
+              </p>
+              <DialogTitle className="font-display text-xl leading-tight text-white">
+                Evidence & Reflections
+              </DialogTitle>
+              <DialogDescription className="mt-1 line-clamp-2 text-xs text-white/85">
+                {subText}
+              </DialogDescription>
             </div>
           </div>
         </DialogHeader>
 
-        <div className="max-h-[calc(90vh-5rem)] overflow-y-auto">
+        <div className="max-h-[calc(92vh-7rem)] overflow-y-auto bg-muted/20">
           {isAdmin && (
-            <div className="border-b border-border bg-muted/30 p-4">
+            <div className="border-b border-border bg-card p-4">
               {!composerOpen ? (
                 <button
                   onClick={() => setComposerOpen(true)}
-                  className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                  className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-soft transition-all hover:-translate-y-0.5 hover:shadow-elevated"
                 >
-                  <Plus className="h-4 w-4" /> New post
+                  <Plus className="h-4 w-4" /> Add new evidence
                 </button>
               ) : (
-                <div className="space-y-3 rounded-xl border border-border bg-card p-4">
+                <div className="space-y-3 rounded-2xl border border-border bg-background p-5 shadow-soft">
+                  <div className="flex items-center gap-2 text-foreground">
+                    <Sparkles className="h-4 w-4 text-primary" />
+                    <h3 className="font-display text-base font-semibold">New evidence</h3>
+                  </div>
                   <label className="block">
                     <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Google Drive share link (image, video, PDF, doc, etc.)
+                      Google Drive link (image, video, PDF, doc…)
                     </span>
                     <input
                       value={newUrl}
                       onChange={(e) => setNewUrl(e.target.value)}
                       placeholder="https://drive.google.com/file/d/..."
-                      className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                      className="mt-1.5 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
                     />
                   </label>
                   <label className="block">
                     <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Caption
+                      Reflection / caption
                     </span>
                     <textarea
                       value={newCaption}
                       onChange={(e) => setNewCaption(e.target.value)}
                       rows={3}
-                      className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                      placeholder="Share your reflection on this evidence…"
+                      className="mt-1.5 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
                     />
                   </label>
                   <div className="flex justify-end gap-2">
@@ -210,16 +223,16 @@ export function EvidenceFeedModal({
                         setNewUrl("");
                         setNewCaption("");
                       }}
-                      className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-accent"
+                      className="inline-flex items-center gap-1 rounded-lg border border-border bg-background px-3.5 py-2 text-xs font-medium hover:bg-accent"
                     >
                       <X className="h-3.5 w-3.5" /> Cancel
                     </button>
                     <button
-                      onClick={addPost}
+                      onClick={addEvidence}
                       disabled={!newUrl.trim()}
-                      className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+                      className="rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-soft hover:bg-primary/90 disabled:opacity-50"
                     >
-                      Post
+                      Publish evidence
                     </button>
                   </div>
                 </div>
@@ -227,27 +240,33 @@ export function EvidenceFeedModal({
             </div>
           )}
 
-          {posts.length === 0 ? (
-            <div className="flex flex-col items-center justify-center gap-3 px-6 py-20 text-center">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted text-muted-foreground">
-                <MessageCircle className="h-6 w-6" />
+          {evidences.length === 0 ? (
+            <div className="flex flex-col items-center justify-center gap-4 px-6 py-24 text-center">
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-muted to-muted/50 text-muted-foreground shadow-soft">
+                <Sparkles className="h-7 w-7" />
               </div>
-              <p className="text-sm text-muted-foreground">
-                {isAdmin
-                  ? "No posts yet — create the first one above."
-                  : "No evidence has been posted yet."}
-              </p>
+              <div>
+                <p className="font-display text-base font-semibold text-foreground">
+                  No evidence yet
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {isAdmin
+                    ? "Add your first piece of evidence above."
+                    : "Check back soon — evidence will appear here."}
+                </p>
+              </div>
             </div>
           ) : (
-            <ul className="divide-y divide-border">
-              {posts.map((post) => (
-                <PostCard
-                  key={post.id}
-                  post={post}
+            <ul className="space-y-5 p-4 sm:p-5">
+              {evidences.map((ev) => (
+                <EvidenceCard
+                  key={ev.id}
+                  evidence={ev}
                   isAdmin={isAdmin}
-                  onToggleLike={() => toggleLike(post.id, post.liked)}
-                  onDelete={() => deletePost(post.id)}
-                  onAddComment={(name, text) => addComment(post.id, name, text)}
+                  cardClass={cardClass}
+                  onToggleLike={() => toggleLike(ev.id, ev.liked)}
+                  onDelete={() => deleteEvidence(ev.id)}
+                  onAddComment={(name, text) => addComment(ev.id, name, text)}
                   onDeleteComment={(commentId) => deleteComment(commentId)}
                 />
               ))}
@@ -259,16 +278,18 @@ export function EvidenceFeedModal({
   );
 }
 
-function PostCard({
-  post,
+function EvidenceCard({
+  evidence,
   isAdmin,
+  cardClass,
   onToggleLike,
   onDelete,
   onAddComment,
   onDeleteComment,
 }: {
-  post: Post;
+  evidence: Evidence;
   isAdmin: boolean;
+  cardClass: string;
   onToggleLike: () => void;
   onDelete: () => void;
   onAddComment: (name: string, text: string) => void;
@@ -276,34 +297,39 @@ function PostCard({
 }) {
   const [name, setName] = useState("");
   const [text, setText] = useState("");
-  const embed = toDrivePreview(post.media_url);
+  const [showComments, setShowComments] = useState(false);
+  const embed = toDrivePreview(evidence.media_url);
 
   return (
-    <li className="bg-card">
-      <div className="flex items-center justify-between px-4 py-3">
-        <p className="text-xs text-muted-foreground">
-          {new Date(post.created_at).toLocaleDateString(undefined, {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-          })}
-        </p>
+    <li className="overflow-hidden rounded-2xl border border-border bg-card shadow-soft transition-shadow hover:shadow-elevated">
+      <div className="flex items-center justify-between border-b border-border/60 px-5 py-3">
+        <div className="flex items-center gap-2.5">
+          <span className={cn("h-2.5 w-2.5 rounded-full", cardClass)} />
+          <p className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+            <Calendar className="h-3.5 w-3.5" />
+            {new Date(evidence.created_at).toLocaleDateString(undefined, {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </p>
+        </div>
         {isAdmin && (
           <button
             onClick={onDelete}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-            aria-label="Delete post"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+            aria-label="Delete evidence"
           >
             <Trash2 className="h-4 w-4" />
           </button>
         )}
       </div>
 
-      <div className="aspect-square w-full bg-black">
+      <div className="aspect-square w-full bg-gradient-to-br from-muted to-muted/40">
         {embed ? (
           <iframe
             src={embed}
-            title={`Evidence ${post.id}`}
+            title={`Evidence ${evidence.id}`}
             className="h-full w-full"
             allow="autoplay"
             allowFullScreen
@@ -311,81 +337,97 @@ function PostCard({
         ) : null}
       </div>
 
-      <div className="px-4 py-3">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={onToggleLike}
-            className={cn(
-              "inline-flex items-center gap-1 text-sm transition-colors",
-              post.liked ? "text-destructive" : "text-foreground hover:text-destructive",
-            )}
-            aria-label={post.liked ? "Unlike" : "Like"}
-          >
-            <Heart className={cn("h-6 w-6", post.liked && "fill-current")} />
-          </button>
-          <MessageCircle className="h-6 w-6 text-foreground" />
-        </div>
-        <p className="mt-2 text-sm font-semibold">
-          {post.likeCount} {post.likeCount === 1 ? "like" : "likes"}
-        </p>
-        {post.caption && (
-          <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-foreground">
-            {post.caption}
+      {evidence.caption && (
+        <div className="px-5 pt-4">
+          <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-foreground">
+            {evidence.caption}
           </p>
-        )}
-      </div>
+        </div>
+      )}
 
-      <div className="border-t border-border px-4 py-3">
-        {post.comments.length > 0 && (
-          <ul className="mb-3 space-y-2">
-            {post.comments.map((c) => (
-              <li key={c.id} className="group flex items-start gap-2 text-sm">
-                <span className="font-semibold text-foreground">{c.author}</span>
-                <span className="flex-1 text-muted-foreground">{c.body}</span>
-                {isAdmin && (
-                  <button
-                    onClick={() => onDeleteComment(c.id)}
-                    className="opacity-0 transition-opacity hover:text-destructive group-hover:opacity-100"
-                    aria-label="Delete comment"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (!text.trim()) return;
-            onAddComment(name, text);
-            setText("");
-          }}
-          className="flex flex-col gap-2 sm:flex-row sm:items-center"
+      <div className="flex items-center gap-1 px-3 py-3">
+        <button
+          onClick={onToggleLike}
+          className={cn(
+            "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-all",
+            evidence.liked
+              ? "bg-destructive/10 text-destructive"
+              : "text-muted-foreground hover:bg-muted hover:text-destructive",
+          )}
+          aria-label={evidence.liked ? "Unlike" : "Like"}
         >
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value.slice(0, 40))}
-            placeholder="Your name"
-            className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 sm:w-32"
-          />
-          <input
-            value={text}
-            onChange={(e) => setText(e.target.value.slice(0, 500))}
-            placeholder="Add a comment…"
-            className="flex-1 rounded-md border border-input bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-          />
-          <button
-            type="submit"
-            disabled={!text.trim()}
-            className="inline-flex items-center justify-center gap-1 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
-          >
-            <Send className="h-3.5 w-3.5" /> Post
-          </button>
-        </form>
+          <Heart className={cn("h-4 w-4", evidence.liked && "fill-current")} />
+          <span>{evidence.likeCount}</span>
+        </button>
+        <button
+          onClick={() => setShowComments((v) => !v)}
+          className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        >
+          <MessageCircle className="h-4 w-4" />
+          <span>{evidence.comments.length}</span>
+        </button>
       </div>
+
+      {(showComments || evidence.comments.length === 0) && (
+        <div className="border-t border-border/60 bg-muted/20 px-5 py-4">
+          {evidence.comments.length > 0 && (
+            <ul className="mb-4 space-y-3">
+              {evidence.comments.map((c) => (
+                <li key={c.id} className="group flex items-start gap-3">
+                  <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-primary/5 text-xs font-semibold text-primary">
+                    {c.author.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="flex-1 rounded-2xl rounded-tl-sm bg-background px-4 py-2.5 shadow-sm">
+                    <div className="flex items-baseline justify-between gap-2">
+                      <span className="text-sm font-semibold text-foreground">{c.author}</span>
+                      {isAdmin && (
+                        <button
+                          onClick={() => onDeleteComment(c.id)}
+                          className="opacity-0 transition-opacity hover:text-destructive group-hover:opacity-100"
+                          aria-label="Delete comment"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      )}
+                    </div>
+                    <p className="text-sm leading-relaxed text-muted-foreground">{c.body}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!text.trim()) return;
+              onAddComment(name, text);
+              setText("");
+            }}
+            className="flex flex-col gap-2 sm:flex-row sm:items-center"
+          >
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value.slice(0, 40))}
+              placeholder="Your name"
+              className="w-full rounded-full border border-input bg-background px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 sm:w-32"
+            />
+            <input
+              value={text}
+              onChange={(e) => setText(e.target.value.slice(0, 500))}
+              placeholder="Share a thought…"
+              className="flex-1 rounded-full border border-input bg-background px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+            />
+            <button
+              type="submit"
+              disabled={!text.trim()}
+              className="inline-flex items-center justify-center gap-1 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-soft hover:bg-primary/90 disabled:opacity-50"
+            >
+              <Send className="h-3.5 w-3.5" /> Send
+            </button>
+          </form>
+        </div>
+      )}
     </li>
   );
 }
