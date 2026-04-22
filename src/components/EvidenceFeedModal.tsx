@@ -11,6 +11,8 @@ import { useAuth } from "@/lib/auth";
 import { getBrowserId, toDrivePreview } from "@/lib/storage";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
+import { TopProgressBar } from "@/components/TopProgressBar";
 
 type Comment = { id: string; author: string; body: string; created_at: string };
 type Evidence = {
