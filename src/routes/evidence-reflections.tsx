@@ -5,6 +5,8 @@ import { indicators } from "@/data/portfolio";
 import { EvidenceFeedModal } from "@/components/EvidenceFeedModal";
 import { toDriveThumbnail } from "@/lib/storage";
 import { supabase } from "@/integrations/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton";
+import { TopProgressBar } from "@/components/TopProgressBar";
 
 export const Route = createFileRoute("/evidence-reflections")({
   head: () => ({
@@ -33,12 +35,22 @@ type Card = {
   indicatorId: number;
 };
 
-function CardThumb({ code, cardClass }: { code: string; cardClass: string }) {
+function CardThumb({
+  code,
+  cardClass,
+  onLoadingChange,
+}: {
+  code: string;
+  cardClass: string;
+  onLoadingChange?: (loading: boolean) => void;
+}) {
   const [count, setCount] = useState<number | null>(null);
   const [latestUrl, setLatestUrl] = useState<string>("");
+  const [imgLoaded, setImgLoaded] = useState(false);
 
   useEffect(() => {
     let active = true;
+    onLoadingChange?.(true);
     const load = async () => {
       const { data, count: c } = await supabase
         .from("posts")
@@ -49,6 +61,7 @@ function CardThumb({ code, cardClass }: { code: string; cardClass: string }) {
       if (!active) return;
       setCount(c ?? 0);
       setLatestUrl(data?.[0]?.media_url ?? "");
+      onLoadingChange?.(false);
     };
     load();
     const channel = supabase
@@ -63,10 +76,23 @@ function CardThumb({ code, cardClass }: { code: string; cardClass: string }) {
       active = false;
       supabase.removeChannel(channel);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [code]);
 
   const thumb = latestUrl ? toDriveThumbnail(latestUrl, 800) : "";
   const hasPosts = (count ?? 0) > 0;
+  const isInitialLoading = count === null;
+
+  if (isInitialLoading) {
+    return (
+      <div className="relative aspect-[4/5] overflow-hidden bg-muted">
+        <Skeleton className="absolute inset-0 h-full w-full rounded-none" />
+        <span className="absolute left-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-xs font-bold text-foreground shadow-soft">
+          {code}
+        </span>
+      </div>
+    );
+  }
 
   return (
     <div className={`relative aspect-[4/5] overflow-hidden ${hasPosts ? "bg-black" : `flex items-center justify-center ${cardClass}`}`}>
@@ -75,17 +101,20 @@ function CardThumb({ code, cardClass }: { code: string; cardClass: string }) {
       </span>
       {hasPosts && thumb ? (
         <>
+          {!imgLoaded && <Skeleton className="absolute inset-0 h-full w-full rounded-none" />}
           <img
             src={thumb}
             alt={`Latest evidence for ${code}`}
             loading="lazy"
             decoding="async"
             referrerPolicy="no-referrer"
-            className="absolute inset-0 h-full w-full object-cover"
+            onLoad={() => setImgLoaded(true)}
+            onError={() => setImgLoaded(true)}
+            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${imgLoaded ? "opacity-100" : "opacity-0"}`}
           />
           {count !== null && count > 1 && (
             <span className="absolute bottom-3 right-3 z-10 rounded-full bg-black/70 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
-              {count} posts
+              {count} evidences
             </span>
           )}
         </>
@@ -94,9 +123,7 @@ function CardThumb({ code, cardClass }: { code: string; cardClass: string }) {
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
             <ImagePlus className="h-6 w-6" />
           </div>
-          <span className="text-sm font-medium">
-            {count === null ? "Loading…" : "No evidence yet"}
-          </span>
+          <span className="text-sm font-medium">No evidence yet</span>
         </div>
       )}
     </div>
@@ -106,6 +133,7 @@ function CardThumb({ code, cardClass }: { code: string; cardClass: string }) {
 function EvidencePage() {
   const [filter, setFilter] = useState<number | "all">("all");
   const [activeCard, setActiveCard] = useState<Card | null>(null);
+  const [loadingCount, setLoadingCount] = useState(0);
 
   const cards = useMemo<Card[]>(() => {
     return indicators.flatMap((ind) =>
@@ -122,8 +150,13 @@ function EvidencePage() {
   const visible = filter === "all" ? cards : cards.filter((c) => c.indicatorId === filter);
   const totalSubs = cards.length;
 
+  const handleThumbLoading = (loading: boolean) => {
+    setLoadingCount((n) => Math.max(0, n + (loading ? 1 : -1)));
+  };
+
   return (
     <div>
+      <TopProgressBar loading={loadingCount > 0} />
       {/* HERO */}
       <section className="bg-gradient-evidence py-20">
         <div className="mx-auto max-w-4xl px-6 text-center">
@@ -167,7 +200,7 @@ function EvidencePage() {
                 onClick={() => setActiveCard(c)}
                 className="group cursor-pointer overflow-hidden rounded-2xl border border-border bg-card text-left shadow-soft transition-all hover:-translate-y-1 hover:shadow-elevated focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               >
-                <CardThumb code={c.code} cardClass={c.cardClass} />
+                <CardThumb code={c.code} cardClass={c.cardClass} onLoadingChange={handleThumbLoading} />
                 <div className="p-5">
                   <span
                     className={`inline-block rounded-full px-3 py-1 text-xs font-semibold text-white ${c.cardClass}`}
