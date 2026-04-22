@@ -44,57 +44,64 @@ export function EvidenceFeedModal({
 }: Props) {
   const { isAdmin } = useAuth();
   const [evidences, setEvidences] = useState<Evidence[]>([]);
+  const [loading, setLoading] = useState(true);
   const [composerOpen, setComposerOpen] = useState(false);
   const [newUrl, setNewUrl] = useState("");
   const [newCaption, setNewCaption] = useState("");
   const browserId = useMemo(() => (open ? getBrowserId() : ""), [open]);
 
-  const refresh = useCallback(async () => {
-    if (!browserId) return;
-    const { data: rows } = await supabase
-      .from("posts")
-      .select("id, media_url, caption, created_at")
-      .eq("indicator_key", subCode)
-      .order("created_at", { ascending: false });
+  const refresh = useCallback(
+    async (showSpinner = false) => {
+      if (!browserId) return;
+      if (showSpinner) setLoading(true);
+      const { data: rows } = await supabase
+        .from("posts")
+        .select("id, media_url, caption, created_at")
+        .eq("indicator_key", subCode)
+        .order("created_at", { ascending: false });
 
-    const ids = (rows ?? []).map((p) => p.id);
-    if (ids.length === 0) {
-      setEvidences([]);
-      return;
-    }
+      const ids = (rows ?? []).map((p) => p.id);
+      if (ids.length === 0) {
+        setEvidences([]);
+        if (showSpinner) setLoading(false);
+        return;
+      }
 
-    const [{ data: likes }, { data: comments }] = await Promise.all([
-      supabase.from("likes").select("post_id, browser_id").in("post_id", ids),
-      supabase
-        .from("comments")
-        .select("id, post_id, author, body, created_at")
-        .in("post_id", ids)
-        .order("created_at", { ascending: true }),
-    ]);
+      const [{ data: likes }, { data: comments }] = await Promise.all([
+        supabase.from("likes").select("post_id, browser_id").in("post_id", ids),
+        supabase
+          .from("comments")
+          .select("id, post_id, author, body, created_at")
+          .in("post_id", ids)
+          .order("created_at", { ascending: true }),
+      ]);
 
-    const likesByPost = new Map<string, { count: number; liked: boolean }>();
-    (likes ?? []).forEach((l) => {
-      const cur = likesByPost.get(l.post_id) ?? { count: 0, liked: false };
-      cur.count += 1;
-      if (l.browser_id === browserId) cur.liked = true;
-      likesByPost.set(l.post_id, cur);
-    });
-    const commentsByPost = new Map<string, Comment[]>();
-    (comments ?? []).forEach((c) => {
-      const arr = commentsByPost.get(c.post_id) ?? [];
-      arr.push({ id: c.id, author: c.author, body: c.body, created_at: c.created_at });
-      commentsByPost.set(c.post_id, arr);
-    });
+      const likesByPost = new Map<string, { count: number; liked: boolean }>();
+      (likes ?? []).forEach((l) => {
+        const cur = likesByPost.get(l.post_id) ?? { count: 0, liked: false };
+        cur.count += 1;
+        if (l.browser_id === browserId) cur.liked = true;
+        likesByPost.set(l.post_id, cur);
+      });
+      const commentsByPost = new Map<string, Comment[]>();
+      (comments ?? []).forEach((c) => {
+        const arr = commentsByPost.get(c.post_id) ?? [];
+        arr.push({ id: c.id, author: c.author, body: c.body, created_at: c.created_at });
+        commentsByPost.set(c.post_id, arr);
+      });
 
-    setEvidences(
-      (rows ?? []).map((p) => ({
-        ...p,
-        likeCount: likesByPost.get(p.id)?.count ?? 0,
-        liked: likesByPost.get(p.id)?.liked ?? false,
-        comments: commentsByPost.get(p.id) ?? [],
-      })),
-    );
-  }, [subCode, browserId]);
+      setEvidences(
+        (rows ?? []).map((p) => ({
+          ...p,
+          likeCount: likesByPost.get(p.id)?.count ?? 0,
+          liked: likesByPost.get(p.id)?.liked ?? false,
+          comments: commentsByPost.get(p.id) ?? [],
+        })),
+      );
+      if (showSpinner) setLoading(false);
+    },
+    [subCode, browserId],
+  );
 
   useEffect(() => {
     if (!open) return;
