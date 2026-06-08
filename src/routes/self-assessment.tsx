@@ -199,8 +199,90 @@ function SelfAssessmentPage() {
         </div>
       </section>
 
-      {/* RATING SCALE */}
+      {/* INTERPRETATION */}
       <section className="bg-muted/40 py-20">
+        <div className="mx-auto max-w-4xl px-6">
+          <h2 className="text-center font-display text-4xl font-bold text-foreground">
+            Summary Interpretation
+          </h2>
+          <p className="mx-auto mt-4 max-w-2xl text-center text-muted-foreground">
+            Based on the total self-assessment score (maximum of 64), the table below shows the
+            current stage within the continuum of teacher development.
+          </p>
+
+          <div className="mt-10 grid gap-6 md:grid-cols-[1fr_2fr]">
+            <div className="rounded-2xl border border-border bg-card p-8 text-center shadow-card">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Total Score
+              </p>
+              <p className="mt-3 font-display text-6xl font-bold text-primary">
+                {totalScore}
+                <span className="text-2xl font-medium text-muted-foreground">/64</span>
+              </p>
+              {interpretation && (
+                <p className="mt-4 inline-block rounded-full bg-primary px-4 py-1.5 text-sm font-semibold text-primary-foreground">
+                  {interpretation.stage} Stage
+                </p>
+              )}
+            </div>
+            <div className="rounded-2xl border border-border bg-card p-8 shadow-card">
+              {interpretation ? (
+                <>
+                  <h3 className="font-display text-2xl font-bold text-foreground">
+                    {interpretation.stage}
+                  </h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Score Range: {interpretation.range}
+                  </p>
+                  <p className="mt-4 leading-relaxed text-foreground">
+                    {interpretation.text}
+                  </p>
+                </>
+              ) : (
+                <p className="text-muted-foreground">
+                  Once enough sub-indicators are rated, the corresponding stage and interpretation
+                  will appear here.
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="mt-10 overflow-hidden rounded-2xl border border-border bg-card shadow-card">
+            <table className="w-full text-sm">
+              <thead className="bg-muted/50 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                <tr>
+                  <th className="px-6 py-3">Score Range</th>
+                  <th className="px-6 py-3">Stage</th>
+                  <th className="px-6 py-3">Interpretation</th>
+                </tr>
+              </thead>
+              <tbody>
+                {interpretationTable.map((row) => {
+                  const active = interpretation?.stage === row.stage;
+                  return (
+                    <tr
+                      key={row.stage}
+                      className={cn(
+                        "border-t border-border align-top",
+                        active && "bg-primary/5",
+                      )}
+                    >
+                      <td className="px-6 py-4 font-semibold text-foreground">{row.range}</td>
+                      <td className="px-6 py-4 font-semibold text-foreground">{row.stage}</td>
+                      <td className="px-6 py-4 leading-relaxed text-muted-foreground">
+                        {row.text}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {/* RATING SCALE */}
+      <section className="py-20">
         <div className="mx-auto max-w-6xl px-6">
           <h2 className="text-center font-display text-4xl font-bold text-foreground">
             Rating Scale
@@ -225,7 +307,7 @@ function SelfAssessmentPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20">
+      <section className="bg-muted/40 py-20">
         <div className="mx-auto max-w-3xl px-6 text-center">
           <h2 className="font-display text-4xl font-bold text-foreground">Explore the Evidence</h2>
           <p className="mt-4 text-muted-foreground">
