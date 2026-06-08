@@ -32,6 +32,11 @@ function SelfAssessmentPage() {
   const totalSubs = indicators.reduce((acc, i) => acc + i.subs.length, 0);
   const [scores, setScores] = useState<Scores>({});
   const ratedCount = Object.values(scores).filter((v) => typeof v === "number").length;
+  const totalScore = Object.values(scores).reduce<number>(
+    (acc, v) => acc + (typeof v === "number" ? v : 0),
+    0,
+  );
+  const interpretation = getInterpretation(totalScore);
 
   useEffect(() => {
     let active = true;
