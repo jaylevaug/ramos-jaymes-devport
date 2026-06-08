@@ -123,7 +123,7 @@ function SelfAssessmentPage() {
         <div className="mx-auto max-w-6xl px-6">
           <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-card">
             <div className="bg-gradient-banner px-8 py-6 text-primary-foreground">
-              <h2 className="font-display text-3xl font-bold">Institutional Outcomes Assessment</h2>
+              <h2 className="font-display text-3xl font-bold">Self-Assessment Tool for Aspiring Professional Stage (STAPS)</h2>
               <p className="mt-2 text-sm text-primary-foreground/80">
                 1 – Not Yet Demonstrated &nbsp;|&nbsp; 2 – Occasionally Demonstrated &nbsp;|&nbsp; 3
                 – Often Demonstrated &nbsp;|&nbsp; 4 – Consistently Demonstrated
@@ -205,13 +205,13 @@ function SelfAssessmentPage() {
           <h2 className="text-center font-display text-4xl font-bold text-foreground">
             Summary Interpretation
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-center text-muted-foreground">
-            The summary score helps you understand your current stage in the continuum of
-            professional development. This interpretation is designed to support your reflection and
-            guide your personal and career growth. It is intended not just as a scoring tool but as
-            a guide for your reflective growth and professional self-awareness as an aspiring
-            professional. The interpretation of scores should be approached as a developmental
-            guide for you rather than a summative judgment of your Year 1 career in the University.
+          <p className="mx-auto mt-4 max-w-3xl text-center text-muted-foreground">
+            <span className="font-semibold text-foreground">Interpreting the Self-Assessment Score.</span>{" "}
+            After completing the self-assessment and calculating the total score (maximum of 64), the
+            table below can be used to determine the current stage within the continuum of teacher
+            development. This interpretation is designed to support reflection and to guide personal
+            and professional growth as pre-service teachers progress toward becoming future
+            professional educators.
           </p>
 
           <div className="mt-10 grid gap-6 md:grid-cols-[1fr_2fr]">
