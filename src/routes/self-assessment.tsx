@@ -32,6 +32,11 @@ function SelfAssessmentPage() {
   const totalSubs = indicators.reduce((acc, i) => acc + i.subs.length, 0);
   const [scores, setScores] = useState<Scores>({});
   const ratedCount = Object.values(scores).filter((v) => typeof v === "number").length;
+  const totalScore = Object.values(scores).reduce<number>(
+    (acc, v) => acc + (typeof v === "number" ? v : 0),
+    0,
+  );
+  const interpretation = getInterpretation(totalScore);
 
   useEffect(() => {
     let active = true;
@@ -194,8 +199,90 @@ function SelfAssessmentPage() {
         </div>
       </section>
 
-      {/* RATING SCALE */}
+      {/* INTERPRETATION */}
       <section className="bg-muted/40 py-20">
+        <div className="mx-auto max-w-4xl px-6">
+          <h2 className="text-center font-display text-4xl font-bold text-foreground">
+            Summary Interpretation
+          </h2>
+          <p className="mx-auto mt-4 max-w-2xl text-center text-muted-foreground">
+            Based on the total self-assessment score (maximum of 64), the table below shows the
+            current stage within the continuum of teacher development.
+          </p>
+
+          <div className="mt-10 grid gap-6 md:grid-cols-[1fr_2fr]">
+            <div className="rounded-2xl border border-border bg-card p-8 text-center shadow-card">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Total Score
+              </p>
+              <p className="mt-3 font-display text-6xl font-bold text-primary">
+                {totalScore}
+                <span className="text-2xl font-medium text-muted-foreground">/64</span>
+              </p>
+              {interpretation && (
+                <p className="mt-4 inline-block rounded-full bg-primary px-4 py-1.5 text-sm font-semibold text-primary-foreground">
+                  {interpretation.stage} Stage
+                </p>
+              )}
+            </div>
+            <div className="rounded-2xl border border-border bg-card p-8 shadow-card">
+              {interpretation ? (
+                <>
+                  <h3 className="font-display text-2xl font-bold text-foreground">
+                    {interpretation.stage}
+                  </h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Score Range: {interpretation.range}
+                  </p>
+                  <p className="mt-4 leading-relaxed text-foreground">
+                    {interpretation.text}
+                  </p>
+                </>
+              ) : (
+                <p className="text-muted-foreground">
+                  Once enough sub-indicators are rated, the corresponding stage and interpretation
+                  will appear here.
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="mt-10 overflow-hidden rounded-2xl border border-border bg-card shadow-card">
+            <table className="w-full text-sm">
+              <thead className="bg-muted/50 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                <tr>
+                  <th className="px-6 py-3">Score Range</th>
+                  <th className="px-6 py-3">Stage</th>
+                  <th className="px-6 py-3">Interpretation</th>
+                </tr>
+              </thead>
+              <tbody>
+                {interpretationTable.map((row) => {
+                  const active = interpretation?.stage === row.stage;
+                  return (
+                    <tr
+                      key={row.stage}
+                      className={cn(
+                        "border-t border-border align-top",
+                        active && "bg-primary/5",
+                      )}
+                    >
+                      <td className="px-6 py-4 font-semibold text-foreground">{row.range}</td>
+                      <td className="px-6 py-4 font-semibold text-foreground">{row.stage}</td>
+                      <td className="px-6 py-4 leading-relaxed text-muted-foreground">
+                        {row.text}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {/* RATING SCALE */}
+      <section className="py-20">
         <div className="mx-auto max-w-6xl px-6">
           <h2 className="text-center font-display text-4xl font-bold text-foreground">
             Rating Scale
@@ -220,7 +307,7 @@ function SelfAssessmentPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20">
+      <section className="bg-muted/40 py-20">
         <div className="mx-auto max-w-3xl px-6 text-center">
           <h2 className="font-display text-4xl font-bold text-foreground">Explore the Evidence</h2>
           <p className="mt-4 text-muted-foreground">
@@ -264,4 +351,42 @@ function ScorePicker({
       ))}
     </div>
   );
+}
+
+type InterpretationRow = { range: string; stage: string; min: number; max: number; text: string };
+
+const interpretationTable: InterpretationRow[] = [
+  {
+    range: "16–24",
+    stage: "Exploring",
+    min: 16,
+    max: 24,
+    text: "You are still discovering what it means to be a future teacher. It's normal to feel uncertain. At this stage, ask questions, seek guidance, and reflect on why you want to teach.",
+  },
+  {
+    range: "25–40",
+    stage: "Emerging",
+    min: 25,
+    max: 40,
+    text: "You are starting to connect with the teaching profession. You show growing interest and awareness of your role. Keep building confidence, learning from experiences, and clarifying your purpose.",
+  },
+  {
+    range: "41–56",
+    stage: "Consolidating",
+    min: 41,
+    max: 56,
+    text: "You are consistently engaged and committed to becoming a teacher. You show responsibility, creativity, and openness to growth. Use this stage to set goals and keep strengthening your skills.",
+  },
+  {
+    range: "57–64",
+    stage: "Building",
+    min: 57,
+    max: 64,
+    text: "You show strong alignment with the values and mindset of teaching. You demonstrate leadership, ethical awareness, and readiness to contribute to others' growth. You are preparing with clear purpose for your future career.",
+  },
+];
+
+function getInterpretation(score: number): InterpretationRow | null {
+  if (score < 16) return null;
+  return interpretationTable.find((r) => score >= r.min && score <= r.max) ?? null;
 }
