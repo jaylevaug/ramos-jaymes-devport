@@ -144,6 +144,14 @@ export function EvidenceFeedModal({
   };
 
   const toggleLike = async (postId: string, liked: boolean) => {
+    // optimistic update
+    setEvidences((prev) =>
+      prev.map((e) =>
+        e.id === postId
+          ? { ...e, liked: !liked, likeCount: e.likeCount + (liked ? -1 : 1) }
+          : e,
+      ),
+    );
     if (liked) {
       await supabase.from("likes").delete().eq("post_id", postId).eq("browser_id", browserId);
     } else {
@@ -152,12 +160,57 @@ export function EvidenceFeedModal({
   };
 
   const addComment = async (postId: string, name: string, text: string) => {
-    await supabase
+    const author = name.trim() || "Anonymous";
+    const body = text.trim();
+    if (!body) return;
+    const tempId = `temp-${crypto.randomUUID()}`;
+    const optimistic: Comment = {
+      id: tempId,
+      author,
+      body,
+      created_at: new Date().toISOString(),
+    };
+    setEvidences((prev) =>
+      prev.map((e) =>
+        e.id === postId ? { ...e, comments: [...e.comments, optimistic] } : e,
+      ),
+    );
+    const { data, error } = await supabase
       .from("comments")
-      .insert({ post_id: postId, author: name.trim() || "Anonymous", body: text.trim() });
+      .insert({ post_id: postId, author, body })
+      .select("id, post_id, author, body, created_at")
+      .single();
+    if (error) {
+      // rollback
+      setEvidences((prev) =>
+        prev.map((e) =>
+          e.id === postId
+            ? { ...e, comments: e.comments.filter((c) => c.id !== tempId) }
+            : e,
+        ),
+      );
+      return;
+    }
+    setEvidences((prev) =>
+      prev.map((e) =>
+        e.id === postId
+          ? {
+              ...e,
+              comments: e.comments.map((c) =>
+                c.id === tempId
+                  ? { id: data.id, author: data.author, body: data.body, created_at: data.created_at }
+                  : c,
+              ),
+            }
+          : e,
+      ),
+    );
   };
 
   const deleteComment = async (commentId: string) => {
+    setEvidences((prev) =>
+      prev.map((e) => ({ ...e, comments: e.comments.filter((c) => c.id !== commentId) })),
+    );
     await supabase.from("comments").delete().eq("id", commentId);
   };
 
