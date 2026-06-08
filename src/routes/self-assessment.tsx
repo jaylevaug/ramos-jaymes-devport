@@ -352,3 +352,41 @@ function ScorePicker({
     </div>
   );
 }
+
+type InterpretationRow = { range: string; stage: string; min: number; max: number; text: string };
+
+const interpretationTable: InterpretationRow[] = [
+  {
+    range: "16–24",
+    stage: "Exploring",
+    min: 16,
+    max: 24,
+    text: "You are still discovering what it means to be a future teacher. It's normal to feel uncertain. At this stage, ask questions, seek guidance, and reflect on why you want to teach.",
+  },
+  {
+    range: "25–40",
+    stage: "Emerging",
+    min: 25,
+    max: 40,
+    text: "You are starting to connect with the teaching profession. You show growing interest and awareness of your role. Keep building confidence, learning from experiences, and clarifying your purpose.",
+  },
+  {
+    range: "41–56",
+    stage: "Consolidating",
+    min: 41,
+    max: 56,
+    text: "You are consistently engaged and committed to becoming a teacher. You show responsibility, creativity, and openness to growth. Use this stage to set goals and keep strengthening your skills.",
+  },
+  {
+    range: "57–64",
+    stage: "Building",
+    min: 57,
+    max: 64,
+    text: "You show strong alignment with the values and mindset of teaching. You demonstrate leadership, ethical awareness, and readiness to contribute to others' growth. You are preparing with clear purpose for your future career.",
+  },
+];
+
+function getInterpretation(score: number): InterpretationRow | null {
+  if (score < 16) return null;
+  return interpretationTable.find((r) => score >= r.min && score <= r.max) ?? null;
+}
