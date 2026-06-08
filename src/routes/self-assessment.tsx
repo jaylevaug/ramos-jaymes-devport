@@ -206,8 +206,12 @@ function SelfAssessmentPage() {
             Summary Interpretation
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-center text-muted-foreground">
-            Based on the total self-assessment score (maximum of 64), the table below shows the
-            current stage within the continuum of teacher development.
+            The summary score helps you understand your current stage in the continuum of
+            professional development. This interpretation is designed to support your reflection and
+            guide your personal and career growth. It is intended not just as a scoring tool but as
+            a guide for your reflective growth and professional self-awareness as an aspiring
+            professional. The interpretation of scores should be approached as a developmental
+            guide for you rather than a summative judgment of your Year 1 career in the University.
           </p>
 
           <div className="mt-10 grid gap-6 md:grid-cols-[1fr_2fr]">
