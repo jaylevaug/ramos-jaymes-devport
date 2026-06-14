@@ -91,16 +91,27 @@ function SelfAssessmentPage() {
       {/* HERO */}
       <section className="bg-gradient-assessment py-20">
         <div className="mx-auto max-w-4xl px-6 text-center">
-          <span className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
-            Year 1 Assessment
-          </span>
-          <h1 className="mt-6 font-display text-5xl font-bold text-foreground sm:text-6xl">
-            Self-Assessment Results
-          </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
-            A comprehensive self-evaluation across five institutional outcomes and sixteen
-            sub-indicators of teaching competence.
-          </p>
+          <EditableText
+            storageKey="sa.hero.badge"
+            defaultValue="Year 1 Assessment"
+            placeholder="Hero badge"
+            as="span"
+            paragraphClassName="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary"
+          />
+          <EditableText
+            storageKey="sa.hero.title"
+            defaultValue="Self-Assessment Results"
+            as="h1"
+            placeholder="Hero title"
+            paragraphClassName="mt-6 font-display text-5xl font-bold text-foreground sm:text-6xl"
+          />
+          <EditableText
+            storageKey="sa.hero.subtitle"
+            defaultValue="A comprehensive self-evaluation across five institutional outcomes and sixteen sub-indicators of teaching competence."
+            placeholder="Hero subtitle"
+            className="mx-auto mt-6 max-w-2xl"
+            paragraphClassName="text-lg text-muted-foreground"
+          />
         </div>
       </section>
 
