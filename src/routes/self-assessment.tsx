@@ -348,9 +348,13 @@ function SelfAssessmentPage() {
       {/* RATING SCALE */}
       <section className="py-20">
         <div className="mx-auto max-w-6xl px-6">
-          <h2 className="text-center font-display text-4xl font-bold text-foreground">
-            Rating Scale
-          </h2>
+          <EditableText
+            storageKey="sa.rating.heading"
+            defaultValue="Rating Scale"
+            as="h2"
+            placeholder="Rating heading"
+            paragraphClassName="text-center font-display text-4xl font-bold text-foreground"
+          />
           <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {ratingScale.map((r) => (
               <div
@@ -360,10 +364,22 @@ function SelfAssessmentPage() {
                 <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 font-display text-3xl font-bold text-primary">
                   {r.score}
                 </div>
-                <h3 className="mt-5 font-display text-xl font-semibold text-foreground">
-                  {r.label}
-                </h3>
-                <p className="mt-2 text-sm text-muted-foreground">{r.desc}</p>
+                <EditableText
+                  storageKey={`sa.rating.${r.score}.label`}
+                  defaultValue={r.label}
+                  as="h3"
+                  placeholder="Label"
+                  className="mt-5"
+                  paragraphClassName="font-display text-xl font-semibold text-foreground"
+                />
+                <EditableText
+                  storageKey={`sa.rating.${r.score}.desc`}
+                  defaultValue={r.desc}
+                  multiline
+                  placeholder="Description"
+                  className="mt-2"
+                  paragraphClassName="mb-2 text-sm text-muted-foreground"
+                />
               </div>
             ))}
           </div>
@@ -373,10 +389,20 @@ function SelfAssessmentPage() {
       {/* CTA */}
       <section className="bg-muted/40 py-20">
         <div className="mx-auto max-w-3xl px-6 text-center">
-          <h2 className="font-display text-4xl font-bold text-foreground">Explore the Evidence</h2>
-          <p className="mt-4 text-muted-foreground">
-            See the artifacts and reflections that demonstrate my growth across all indicators.
-          </p>
+          <EditableText
+            storageKey="sa.cta.heading"
+            defaultValue="Explore the Evidence"
+            as="h2"
+            placeholder="CTA heading"
+            paragraphClassName="font-display text-4xl font-bold text-foreground"
+          />
+          <EditableText
+            storageKey="sa.cta.body"
+            defaultValue="See the artifacts and reflections that demonstrate my growth across all indicators."
+            placeholder="CTA body"
+            className="mt-4"
+            paragraphClassName="text-muted-foreground"
+          />
           <Link
             to="/evidence-reflections"
             className="mt-8 inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-elevated transition-all hover:scale-[1.02] hover:bg-primary/90"
