@@ -291,7 +291,7 @@ function SelfAssessmentPage() {
             </div>
           </div>
 
-          <div className="mt-10 overflow-hidden rounded-2xl border border-border bg-card shadow-card">
+          <div className="mt-10 rounded-2xl border border-border bg-card shadow-card">
             <table className="w-full text-sm">
               <thead className="bg-muted/50 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 <tr>
