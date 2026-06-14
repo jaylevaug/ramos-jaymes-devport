@@ -5,6 +5,7 @@ import { indicators, ratingScale } from "@/data/portfolio";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { EditableText } from "@/components/EditableText";
 
 export const Route = createFileRoute("/self-assessment")({
   head: () => ({
@@ -90,16 +91,27 @@ function SelfAssessmentPage() {
       {/* HERO */}
       <section className="bg-gradient-assessment py-20">
         <div className="mx-auto max-w-4xl px-6 text-center">
-          <span className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
-            Year 1 Assessment
-          </span>
-          <h1 className="mt-6 font-display text-5xl font-bold text-foreground sm:text-6xl">
-            Self-Assessment Results
-          </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
-            A comprehensive self-evaluation across five institutional outcomes and sixteen
-            sub-indicators of teaching competence.
-          </p>
+          <EditableText
+            storageKey="sa.hero.badge"
+            defaultValue="Year 1 Assessment"
+            placeholder="Hero badge"
+            as="span"
+            paragraphClassName="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary"
+          />
+          <EditableText
+            storageKey="sa.hero.title"
+            defaultValue="Self-Assessment Results"
+            as="h1"
+            placeholder="Hero title"
+            paragraphClassName="mt-6 font-display text-5xl font-bold text-foreground sm:text-6xl"
+          />
+          <EditableText
+            storageKey="sa.hero.subtitle"
+            defaultValue="A comprehensive self-evaluation across five institutional outcomes and sixteen sub-indicators of teaching competence."
+            placeholder="Hero subtitle"
+            className="mx-auto mt-6 max-w-2xl"
+            paragraphClassName="text-lg text-muted-foreground"
+          />
         </div>
       </section>
 
@@ -123,11 +135,20 @@ function SelfAssessmentPage() {
         <div className="mx-auto max-w-6xl px-6">
           <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-card">
             <div className="bg-gradient-banner px-8 py-6 text-primary-foreground">
-              <h2 className="font-display text-3xl font-bold">Self-Assessment Tool for Aspiring Professional Stage (STAPS)</h2>
-              <p className="mt-2 text-sm text-primary-foreground/80">
-                1 – Not Yet Demonstrated &nbsp;|&nbsp; 2 – Occasionally Demonstrated &nbsp;|&nbsp; 3
-                – Often Demonstrated &nbsp;|&nbsp; 4 – Consistently Demonstrated
-              </p>
+              <EditableText
+                storageKey="sa.table.title"
+                defaultValue="Self-Assessment Tool for Aspiring Professional Stage (STAPS)"
+                as="h2"
+                placeholder="Table title"
+                paragraphClassName="font-display text-3xl font-bold"
+              />
+              <EditableText
+                storageKey="sa.table.legend"
+                defaultValue="1 – Not Yet Demonstrated  |  2 – Occasionally Demonstrated  |  3 – Often Demonstrated  |  4 – Consistently Demonstrated"
+                placeholder="Rating legend"
+                className="mt-2"
+                paragraphClassName="text-sm text-primary-foreground/80"
+              />
             </div>
 
             <div className="overflow-x-auto">
@@ -202,17 +223,21 @@ function SelfAssessmentPage() {
       {/* INTERPRETATION */}
       <section className="bg-muted/40 py-20">
         <div className="mx-auto max-w-4xl px-6">
-          <h2 className="text-center font-display text-4xl font-bold text-foreground">
-            Summary Interpretation
-          </h2>
-          <p className="mx-auto mt-4 max-w-3xl text-center text-muted-foreground">
-            <span className="font-semibold text-foreground">Interpreting the Self-Assessment Score.</span>{" "}
-            After completing the self-assessment and calculating the total score (maximum of 64), the
-            table below can be used to determine the current stage within the continuum of teacher
-            development. This interpretation is designed to support reflection and to guide personal
-            and professional growth as pre-service teachers progress toward becoming future
-            professional educators.
-          </p>
+          <EditableText
+            storageKey="sa.interp.heading"
+            defaultValue="Summary Interpretation"
+            as="h2"
+            placeholder="Interpretation heading"
+            paragraphClassName="text-center font-display text-4xl font-bold text-foreground"
+          />
+          <EditableText
+            storageKey="sa.interp.intro"
+            defaultValue="Interpreting the Self-Assessment Score. After completing the self-assessment and calculating the total score (maximum of 64), the table below can be used to determine the current stage within the continuum of teacher development. This interpretation is designed to support reflection and to guide personal and professional growth as pre-service teachers progress toward becoming future professional educators."
+            multiline
+            placeholder="Interpretation intro"
+            className="mx-auto mt-4 max-w-3xl"
+            paragraphClassName="mb-3 text-center text-muted-foreground"
+          />
 
           <div className="mt-10 grid gap-6 md:grid-cols-[1fr_2fr]">
             <div className="rounded-2xl border border-border bg-card p-8 text-center shadow-card">
@@ -232,21 +257,36 @@ function SelfAssessmentPage() {
             <div className="rounded-2xl border border-border bg-card p-8 shadow-card">
               {interpretation ? (
                 <>
-                  <h3 className="font-display text-2xl font-bold text-foreground">
-                    {interpretation.stage}
-                  </h3>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    Score Range: {interpretation.range}
-                  </p>
-                  <p className="mt-4 leading-relaxed text-foreground">
-                    {interpretation.text}
-                  </p>
+                  <EditableText
+                    storageKey={`sa.interp.${interpretation.stage}.stage`}
+                    defaultValue={interpretation.stage}
+                    as="h3"
+                    placeholder="Stage name"
+                    paragraphClassName="font-display text-2xl font-bold text-foreground"
+                  />
+                  <EditableText
+                    storageKey={`sa.interp.${interpretation.stage}.range`}
+                    defaultValue={`Score Range: ${interpretation.range}`}
+                    placeholder="Score range"
+                    className="mt-1"
+                    paragraphClassName="text-sm text-muted-foreground"
+                  />
+                  <EditableText
+                    storageKey={`sa.interp.${interpretation.stage}.text`}
+                    defaultValue={interpretation.text}
+                    multiline
+                    placeholder="Stage interpretation"
+                    className="mt-4"
+                    paragraphClassName="mb-3 leading-relaxed text-foreground"
+                  />
                 </>
               ) : (
-                <p className="text-muted-foreground">
-                  Once enough sub-indicators are rated, the corresponding stage and interpretation
-                  will appear here.
-                </p>
+                <EditableText
+                  storageKey="sa.interp.empty"
+                  defaultValue="Once enough sub-indicators are rated, the corresponding stage and interpretation will appear here."
+                  placeholder="Empty state"
+                  paragraphClassName="text-muted-foreground"
+                />
               )}
             </div>
           </div>
@@ -271,10 +311,30 @@ function SelfAssessmentPage() {
                         active && "bg-primary/5",
                       )}
                     >
-                      <td className="px-6 py-4 font-semibold text-foreground">{row.range}</td>
-                      <td className="px-6 py-4 font-semibold text-foreground">{row.stage}</td>
+                      <td className="px-6 py-4 font-semibold text-foreground">
+                        <EditableText
+                          storageKey={`sa.table.${row.stage}.range`}
+                          defaultValue={row.range}
+                          placeholder="Range"
+                          paragraphClassName="font-semibold text-foreground"
+                        />
+                      </td>
+                      <td className="px-6 py-4 font-semibold text-foreground">
+                        <EditableText
+                          storageKey={`sa.table.${row.stage}.stage`}
+                          defaultValue={row.stage}
+                          placeholder="Stage"
+                          paragraphClassName="font-semibold text-foreground"
+                        />
+                      </td>
                       <td className="px-6 py-4 leading-relaxed text-muted-foreground">
-                        {row.text}
+                        <EditableText
+                          storageKey={`sa.table.${row.stage}.text`}
+                          defaultValue={row.text}
+                          multiline
+                          placeholder="Interpretation"
+                          paragraphClassName="mb-2 leading-relaxed text-muted-foreground"
+                        />
                       </td>
                     </tr>
                   );
@@ -288,9 +348,13 @@ function SelfAssessmentPage() {
       {/* RATING SCALE */}
       <section className="py-20">
         <div className="mx-auto max-w-6xl px-6">
-          <h2 className="text-center font-display text-4xl font-bold text-foreground">
-            Rating Scale
-          </h2>
+          <EditableText
+            storageKey="sa.rating.heading"
+            defaultValue="Rating Scale"
+            as="h2"
+            placeholder="Rating heading"
+            paragraphClassName="text-center font-display text-4xl font-bold text-foreground"
+          />
           <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {ratingScale.map((r) => (
               <div
@@ -300,10 +364,22 @@ function SelfAssessmentPage() {
                 <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 font-display text-3xl font-bold text-primary">
                   {r.score}
                 </div>
-                <h3 className="mt-5 font-display text-xl font-semibold text-foreground">
-                  {r.label}
-                </h3>
-                <p className="mt-2 text-sm text-muted-foreground">{r.desc}</p>
+                <EditableText
+                  storageKey={`sa.rating.${r.score}.label`}
+                  defaultValue={r.label}
+                  as="h3"
+                  placeholder="Label"
+                  className="mt-5"
+                  paragraphClassName="font-display text-xl font-semibold text-foreground"
+                />
+                <EditableText
+                  storageKey={`sa.rating.${r.score}.desc`}
+                  defaultValue={r.desc}
+                  multiline
+                  placeholder="Description"
+                  className="mt-2"
+                  paragraphClassName="mb-2 text-sm text-muted-foreground"
+                />
               </div>
             ))}
           </div>
@@ -313,10 +389,20 @@ function SelfAssessmentPage() {
       {/* CTA */}
       <section className="bg-muted/40 py-20">
         <div className="mx-auto max-w-3xl px-6 text-center">
-          <h2 className="font-display text-4xl font-bold text-foreground">Explore the Evidence</h2>
-          <p className="mt-4 text-muted-foreground">
-            See the artifacts and reflections that demonstrate my growth across all indicators.
-          </p>
+          <EditableText
+            storageKey="sa.cta.heading"
+            defaultValue="Explore the Evidence"
+            as="h2"
+            placeholder="CTA heading"
+            paragraphClassName="font-display text-4xl font-bold text-foreground"
+          />
+          <EditableText
+            storageKey="sa.cta.body"
+            defaultValue="See the artifacts and reflections that demonstrate my growth across all indicators."
+            placeholder="CTA body"
+            className="mt-4"
+            paragraphClassName="text-muted-foreground"
+          />
           <Link
             to="/evidence-reflections"
             className="mt-8 inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-elevated transition-all hover:scale-[1.02] hover:bg-primary/90"
