@@ -223,17 +223,21 @@ function SelfAssessmentPage() {
       {/* INTERPRETATION */}
       <section className="bg-muted/40 py-20">
         <div className="mx-auto max-w-4xl px-6">
-          <h2 className="text-center font-display text-4xl font-bold text-foreground">
-            Summary Interpretation
-          </h2>
-          <p className="mx-auto mt-4 max-w-3xl text-center text-muted-foreground">
-            <span className="font-semibold text-foreground">Interpreting the Self-Assessment Score.</span>{" "}
-            After completing the self-assessment and calculating the total score (maximum of 64), the
-            table below can be used to determine the current stage within the continuum of teacher
-            development. This interpretation is designed to support reflection and to guide personal
-            and professional growth as pre-service teachers progress toward becoming future
-            professional educators.
-          </p>
+          <EditableText
+            storageKey="sa.interp.heading"
+            defaultValue="Summary Interpretation"
+            as="h2"
+            placeholder="Interpretation heading"
+            paragraphClassName="text-center font-display text-4xl font-bold text-foreground"
+          />
+          <EditableText
+            storageKey="sa.interp.intro"
+            defaultValue="Interpreting the Self-Assessment Score. After completing the self-assessment and calculating the total score (maximum of 64), the table below can be used to determine the current stage within the continuum of teacher development. This interpretation is designed to support reflection and to guide personal and professional growth as pre-service teachers progress toward becoming future professional educators."
+            multiline
+            placeholder="Interpretation intro"
+            className="mx-auto mt-4 max-w-3xl"
+            paragraphClassName="mb-3 text-center text-muted-foreground"
+          />
 
           <div className="mt-10 grid gap-6 md:grid-cols-[1fr_2fr]">
             <div className="rounded-2xl border border-border bg-card p-8 text-center shadow-card">
@@ -253,21 +257,36 @@ function SelfAssessmentPage() {
             <div className="rounded-2xl border border-border bg-card p-8 shadow-card">
               {interpretation ? (
                 <>
-                  <h3 className="font-display text-2xl font-bold text-foreground">
-                    {interpretation.stage}
-                  </h3>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    Score Range: {interpretation.range}
-                  </p>
-                  <p className="mt-4 leading-relaxed text-foreground">
-                    {interpretation.text}
-                  </p>
+                  <EditableText
+                    storageKey={`sa.interp.${interpretation.stage}.stage`}
+                    defaultValue={interpretation.stage}
+                    as="h3"
+                    placeholder="Stage name"
+                    paragraphClassName="font-display text-2xl font-bold text-foreground"
+                  />
+                  <EditableText
+                    storageKey={`sa.interp.${interpretation.stage}.range`}
+                    defaultValue={`Score Range: ${interpretation.range}`}
+                    placeholder="Score range"
+                    className="mt-1"
+                    paragraphClassName="text-sm text-muted-foreground"
+                  />
+                  <EditableText
+                    storageKey={`sa.interp.${interpretation.stage}.text`}
+                    defaultValue={interpretation.text}
+                    multiline
+                    placeholder="Stage interpretation"
+                    className="mt-4"
+                    paragraphClassName="mb-3 leading-relaxed text-foreground"
+                  />
                 </>
               ) : (
-                <p className="text-muted-foreground">
-                  Once enough sub-indicators are rated, the corresponding stage and interpretation
-                  will appear here.
-                </p>
+                <EditableText
+                  storageKey="sa.interp.empty"
+                  defaultValue="Once enough sub-indicators are rated, the corresponding stage and interpretation will appear here."
+                  placeholder="Empty state"
+                  paragraphClassName="text-muted-foreground"
+                />
               )}
             </div>
           </div>
@@ -292,10 +311,30 @@ function SelfAssessmentPage() {
                         active && "bg-primary/5",
                       )}
                     >
-                      <td className="px-6 py-4 font-semibold text-foreground">{row.range}</td>
-                      <td className="px-6 py-4 font-semibold text-foreground">{row.stage}</td>
+                      <td className="px-6 py-4 font-semibold text-foreground">
+                        <EditableText
+                          storageKey={`sa.table.${row.stage}.range`}
+                          defaultValue={row.range}
+                          placeholder="Range"
+                          paragraphClassName="font-semibold text-foreground"
+                        />
+                      </td>
+                      <td className="px-6 py-4 font-semibold text-foreground">
+                        <EditableText
+                          storageKey={`sa.table.${row.stage}.stage`}
+                          defaultValue={row.stage}
+                          placeholder="Stage"
+                          paragraphClassName="font-semibold text-foreground"
+                        />
+                      </td>
                       <td className="px-6 py-4 leading-relaxed text-muted-foreground">
-                        {row.text}
+                        <EditableText
+                          storageKey={`sa.table.${row.stage}.text`}
+                          defaultValue={row.text}
+                          multiline
+                          placeholder="Interpretation"
+                          paragraphClassName="mb-2 leading-relaxed text-muted-foreground"
+                        />
                       </td>
                     </tr>
                   );
