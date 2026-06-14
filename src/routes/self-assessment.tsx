@@ -451,29 +451,30 @@ const interpretationTable: InterpretationRow[] = [
     stage: "Exploring",
     min: 16,
     max: 24,
-    text: "You are still discovering what it means to be a future teacher. It's normal to feel uncertain. At this stage, ask questions, seek guidance, and reflect on why you want to teach.",
+    text: "You are beginning to understand your field and how your experiences connect to future goals. Stay open, ask questions, and start identifying your values and strengths.",
   },
   {
     range: "25–40",
     stage: "Emerging",
     min: 25,
     max: 40,
-    text: "You are starting to connect with the teaching profession. You show growing interest and awareness of your role. Keep building confidence, learning from experiences, and clarifying your purpose.",
+    text: "You are engaging with your field's expectations and values, showing growing awareness and curiosity. Build confidence, form good habits, and seek meaningful experiences.",
   },
   {
     range: "41–56",
     stage: "Consolidating",
     min: 41,
     max: 56,
-    text: "You are consistently engaged and committed to becoming a teacher. You show responsibility, creativity, and openness to growth. Use this stage to set goals and keep strengthening your skills.",
+    text: "You demonstrate consistent engagement and a clearer sense of purpose. You show initiative, openness to feedback, and readiness for greater responsibility.",
   },
   {
     range: "57–64",
     stage: "Building",
     min: 57,
     max: 64,
-    text: "You show strong alignment with the values and mindset of teaching. You demonstrate leadership, ethical awareness, and readiness to contribute to others' growth. You are preparing with clear purpose for your future career.",
+    text: "You are strongly aligned with your field's core values. Your responses reflect intentional learning, ethical awareness, and developing leadership. Continue refining skills and contributing meaningfully to your community.",
   },
+
 ];
 
 function getInterpretation(score: number): InterpretationRow | null {
