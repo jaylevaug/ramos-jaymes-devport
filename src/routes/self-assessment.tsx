@@ -5,6 +5,7 @@ import { indicators, ratingScale } from "@/data/portfolio";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { EditableText } from "@/components/EditableText";
 
 export const Route = createFileRoute("/self-assessment")({
   head: () => ({
