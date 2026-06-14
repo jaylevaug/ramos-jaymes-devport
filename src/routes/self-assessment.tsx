@@ -135,11 +135,20 @@ function SelfAssessmentPage() {
         <div className="mx-auto max-w-6xl px-6">
           <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-card">
             <div className="bg-gradient-banner px-8 py-6 text-primary-foreground">
-              <h2 className="font-display text-3xl font-bold">Self-Assessment Tool for Aspiring Professional Stage (STAPS)</h2>
-              <p className="mt-2 text-sm text-primary-foreground/80">
-                1 – Not Yet Demonstrated &nbsp;|&nbsp; 2 – Occasionally Demonstrated &nbsp;|&nbsp; 3
-                – Often Demonstrated &nbsp;|&nbsp; 4 – Consistently Demonstrated
-              </p>
+              <EditableText
+                storageKey="sa.table.title"
+                defaultValue="Self-Assessment Tool for Aspiring Professional Stage (STAPS)"
+                as="h2"
+                placeholder="Table title"
+                paragraphClassName="font-display text-3xl font-bold"
+              />
+              <EditableText
+                storageKey="sa.table.legend"
+                defaultValue="1 – Not Yet Demonstrated  |  2 – Occasionally Demonstrated  |  3 – Often Demonstrated  |  4 – Consistently Demonstrated"
+                placeholder="Rating legend"
+                className="mt-2"
+                paragraphClassName="text-sm text-primary-foreground/80"
+              />
             </div>
 
             <div className="overflow-x-auto">
