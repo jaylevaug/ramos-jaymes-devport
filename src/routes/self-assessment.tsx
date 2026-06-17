@@ -447,6 +447,13 @@ type InterpretationRow = { range: string; stage: string; min: number; max: numbe
 
 const interpretationTable: InterpretationRow[] = [
   {
+    range: "0–15",
+    stage: "Beginning",
+    min: 0,
+    max: 15,
+    text: "You are starting your professional development journey. Complete the self-assessment to discover where you stand on the continuum of aspiring professional growth.",
+  },
+  {
     range: "16–24",
     stage: "Exploring",
     min: 16,
@@ -474,10 +481,8 @@ const interpretationTable: InterpretationRow[] = [
     max: 64,
     text: "You are strongly aligned with your field's core values. Your responses reflect intentional learning, ethical awareness, and developing leadership. Continue refining skills and contributing meaningfully to your community.",
   },
-
 ];
 
-function getInterpretation(score: number): InterpretationRow | null {
-  if (score < 16) return null;
-  return interpretationTable.find((r) => score >= r.min && score <= r.max) ?? null;
+function getInterpretation(score: number): InterpretationRow {
+  return interpretationTable.find((r) => score >= r.min && score <= r.max) ?? interpretationTable[0];
 }
