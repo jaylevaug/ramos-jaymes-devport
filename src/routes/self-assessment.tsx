@@ -248,46 +248,33 @@ function SelfAssessmentPage() {
                 {totalScore}
                 <span className="text-2xl font-medium text-muted-foreground">/64</span>
               </p>
-              {interpretation && (
-                <p className="mt-4 inline-block rounded-full bg-primary px-4 py-1.5 text-sm font-semibold text-primary-foreground">
-                  {interpretation.stage} Stage
-                </p>
-              )}
+              <p className="mt-4 inline-block rounded-full bg-primary px-4 py-1.5 text-sm font-semibold text-primary-foreground">
+                {interpretation.stage} Stage
+              </p>
             </div>
             <div className="rounded-2xl border border-border bg-card p-8 shadow-card">
-              {interpretation ? (
-                <>
-                  <EditableText
-                    storageKey={`sa.interp.${interpretation.stage}.stage`}
-                    defaultValue={interpretation.stage}
-                    as="h3"
-                    placeholder="Stage name"
-                    paragraphClassName="font-display text-2xl font-bold text-foreground"
-                  />
-                  <EditableText
-                    storageKey={`sa.interp.${interpretation.stage}.range`}
-                    defaultValue={`Score Range: ${interpretation.range}`}
-                    placeholder="Score range"
-                    className="mt-1"
-                    paragraphClassName="text-sm text-muted-foreground"
-                  />
-                  <EditableText
-                    storageKey={`sa.interp.${interpretation.stage}.text`}
-                    defaultValue={interpretation.text}
-                    multiline
-                    placeholder="Stage interpretation"
-                    className="mt-4"
-                    paragraphClassName="mb-3 leading-relaxed text-foreground"
-                  />
-                </>
-              ) : (
-                <EditableText
-                  storageKey="sa.interp.empty"
-                  defaultValue="Once enough sub-indicators are rated, the corresponding stage and interpretation will appear here."
-                  placeholder="Empty state"
-                  paragraphClassName="text-muted-foreground"
-                />
-              )}
+              <EditableText
+                storageKey={`sa.interp.${interpretation.stage}.stage`}
+                defaultValue={interpretation.stage}
+                as="h3"
+                placeholder="Stage name"
+                paragraphClassName="font-display text-2xl font-bold text-foreground"
+              />
+              <EditableText
+                storageKey={`sa.interp.${interpretation.stage}.range`}
+                defaultValue={`Score Range: ${interpretation.range}`}
+                placeholder="Score range"
+                className="mt-1"
+                paragraphClassName="text-sm text-muted-foreground"
+              />
+              <EditableText
+                storageKey={`sa.interp.${interpretation.stage}.text`}
+                defaultValue={interpretation.text}
+                multiline
+                placeholder="Stage interpretation"
+                className="mt-4"
+                paragraphClassName="mb-3 leading-relaxed text-foreground"
+              />
             </div>
           </div>
 
@@ -447,6 +434,13 @@ type InterpretationRow = { range: string; stage: string; min: number; max: numbe
 
 const interpretationTable: InterpretationRow[] = [
   {
+    range: "0–15",
+    stage: "Beginning",
+    min: 0,
+    max: 15,
+    text: "You are starting your professional development journey. Complete the self-assessment to discover where you stand on the continuum of aspiring professional growth.",
+  },
+  {
     range: "16–24",
     stage: "Exploring",
     min: 16,
@@ -474,10 +468,8 @@ const interpretationTable: InterpretationRow[] = [
     max: 64,
     text: "You are strongly aligned with your field's core values. Your responses reflect intentional learning, ethical awareness, and developing leadership. Continue refining skills and contributing meaningfully to your community.",
   },
-
 ];
 
-function getInterpretation(score: number): InterpretationRow | null {
-  if (score < 16) return null;
-  return interpretationTable.find((r) => score >= r.min && score <= r.max) ?? null;
+function getInterpretation(score: number): InterpretationRow {
+  return interpretationTable.find((r) => score >= r.min && score <= r.max) ?? interpretationTable[0];
 }
