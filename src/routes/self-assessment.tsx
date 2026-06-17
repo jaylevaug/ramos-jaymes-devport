@@ -248,11 +248,9 @@ function SelfAssessmentPage() {
                 {totalScore}
                 <span className="text-2xl font-medium text-muted-foreground">/64</span>
               </p>
-              {interpretation && (
-                <p className="mt-4 inline-block rounded-full bg-primary px-4 py-1.5 text-sm font-semibold text-primary-foreground">
-                  {interpretation.stage} Stage
-                </p>
-              )}
+              <p className="mt-4 inline-block rounded-full bg-primary px-4 py-1.5 text-sm font-semibold text-primary-foreground">
+                {interpretation.stage} Stage
+              </p>
             </div>
             <div className="rounded-2xl border border-border bg-card p-8 shadow-card">
               <EditableText
