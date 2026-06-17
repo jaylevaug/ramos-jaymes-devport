@@ -72,8 +72,8 @@ export const indicators: Indicator[] = [
 ];
 
 export const ratingScale = [
-  { score: 1, label: "Not Yet Demonstrated", desc: "Limited or emerging evidence of the indicator." },
-  { score: 2, label: "Occasionally Demonstrated", desc: "Indicator is shown in some situations." },
-  { score: 3, label: "Often Demonstrated", desc: "Consistent evidence across multiple contexts." },
-  { score: 4, label: "Consistently Demonstrated", desc: "Strong, sustained evidence in all relevant contexts." },
+  { score: 1, label: "Not Yet Demonstrated", desc: "I am still developing my understanding and ability to apply this in my practice. I seldom demonstrate this behavior or competency." },
+  { score: 2, label: "Occasionally Demonstrated", desc: "I show this sometimes, but I need more practice or clarity in applying it. I sometimes show this behavior or competency, but not consistently." },
+  { score: 3, label: "Often Demonstrated", desc: "I apply this in most situations, but not consistently. I usually demonstrate this behavior or competency." },
+  { score: 4, label: "Consistently Demonstrated", desc: "I consistently apply or embody this in my academic and teaching-related activities. I regularly demonstrate this behavior or competency." },
 ];
