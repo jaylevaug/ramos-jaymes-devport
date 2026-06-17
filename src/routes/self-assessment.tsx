@@ -255,39 +255,28 @@ function SelfAssessmentPage() {
               )}
             </div>
             <div className="rounded-2xl border border-border bg-card p-8 shadow-card">
-              {interpretation ? (
-                <>
-                  <EditableText
-                    storageKey={`sa.interp.${interpretation.stage}.stage`}
-                    defaultValue={interpretation.stage}
-                    as="h3"
-                    placeholder="Stage name"
-                    paragraphClassName="font-display text-2xl font-bold text-foreground"
-                  />
-                  <EditableText
-                    storageKey={`sa.interp.${interpretation.stage}.range`}
-                    defaultValue={`Score Range: ${interpretation.range}`}
-                    placeholder="Score range"
-                    className="mt-1"
-                    paragraphClassName="text-sm text-muted-foreground"
-                  />
-                  <EditableText
-                    storageKey={`sa.interp.${interpretation.stage}.text`}
-                    defaultValue={interpretation.text}
-                    multiline
-                    placeholder="Stage interpretation"
-                    className="mt-4"
-                    paragraphClassName="mb-3 leading-relaxed text-foreground"
-                  />
-                </>
-              ) : (
-                <EditableText
-                  storageKey="sa.interp.empty"
-                  defaultValue="Once enough sub-indicators are rated, the corresponding stage and interpretation will appear here."
-                  placeholder="Empty state"
-                  paragraphClassName="text-muted-foreground"
-                />
-              )}
+              <EditableText
+                storageKey={`sa.interp.${interpretation.stage}.stage`}
+                defaultValue={interpretation.stage}
+                as="h3"
+                placeholder="Stage name"
+                paragraphClassName="font-display text-2xl font-bold text-foreground"
+              />
+              <EditableText
+                storageKey={`sa.interp.${interpretation.stage}.range`}
+                defaultValue={`Score Range: ${interpretation.range}`}
+                placeholder="Score range"
+                className="mt-1"
+                paragraphClassName="text-sm text-muted-foreground"
+              />
+              <EditableText
+                storageKey={`sa.interp.${interpretation.stage}.text`}
+                defaultValue={interpretation.text}
+                multiline
+                placeholder="Stage interpretation"
+                className="mt-4"
+                paragraphClassName="mb-3 leading-relaxed text-foreground"
+              />
             </div>
           </div>
 
