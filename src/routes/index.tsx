@@ -117,36 +117,18 @@ function HomePage() {
             />
             <div>
               <EditableText
-                storageKey="home.philosophy.eyebrow"
-                defaultValue="My Teaching Philosophy"
-                placeholder="Eyebrow"
-                paragraphClassName="text-xs font-semibold uppercase tracking-[0.25em] text-primary"
-              />
-              <EditableText
-                storageKey="home.philosophy.heading"
-                defaultValue="My Becoming of a Student-Centered Teacher"
-                as="h2"
-                placeholder="Section heading"
-                paragraphClassName="mt-4 font-display text-4xl font-bold leading-tight text-foreground sm:text-5xl"
-              />
-              <EditableText
                 storageKey="home.philosophy.body"
                 multiline
-                defaultValue=""
+                defaultValue="According to the news article of PhilStar Ngayon (2024), Filipino learners ranked 76th out of 81 countries in the Programme for International Student Assessment (PISA). This is not merely a statistic; rather, it reflects the challenges and shortcomings of the Philippine educational system. Therefore, it is important to construct an education system that promotes a Filipino student-centered curriculum and learning process.
+
+In order for a learner to become proficient in a subject, an educator must first know how to teach concepts in a way that students can understand. There are many barriers to lesson comprehension, such as the complexity of the concepts being taught. However, low comprehension can be alleviated when teachers use a language that students understand. In the Philippines, especially in basic education, most subjects are taught in English, textbooks are written in English, and there are even existing policies that encourage students to communicate only in English. Although there is a transition phase from the learners' mother tongue to the English language in formal education, it remains insufficient because (1) the transition period is relatively short, and (2) most Filipinos, if not all, primarily use Filipino as a medium of communication in their households. The use of Filipino and student-friendly language does not deconstruct the formality of education; rather, it improves the learning outcomes of Filipino students.
+
+Most Filipino students do not fully appreciate concepts because they often learn them only in theory and not in practice. For example, students may learn the parts of a microscope and be taught how to use it, but they may not fully appreciate the concept because they have not had the opportunity to actually observe and handle a microscope. While I acknowledge that there are existing challenges in school funding, I propose the use of online simulators and other digital learning tools. Through these resources, learners can better appreciate the concepts being taught to them. Consequently, when the time comes for them to immerse themselves in their respective fields, they will already have a foundational understanding of how to perform such tasks and apply their knowledge effectively.
+
+Instead of relying solely on tests that evaluate how well learners memorize information from their textbooks, I suggest the use of assessments that allow students to demonstrate their understanding through projects, whether in the form of a concept paper, research study, prototype, or performance task. If a teacher still wishes to administer examinations, these should be situational and reflective in nature so that they genuinely assess the students' learning and understanding rather than their ability to memorize information."
                 placeholder="Share your teaching philosophy here"
-                className="mt-8"
-                paragraphClassName="mb-5 text-base leading-relaxed text-muted-foreground sm:text-lg"
+                paragraphClassName="text-base leading-relaxed text-muted-foreground sm:text-lg"
               />
-              <figure className="mt-8 rounded-2xl border border-border bg-card p-6 shadow-card">
-                <Quote className="h-7 w-7 text-primary" />
-                <EditableText
-                  storageKey="home.philosophy.quote"
-                  defaultValue=""
-                  placeholder="Add your guiding quote"
-                  as="p"
-                  paragraphClassName="mt-3 font-display text-xl italic leading-snug text-foreground sm:text-2xl"
-                />
-              </figure>
             </div>
           </div>
         </div>
