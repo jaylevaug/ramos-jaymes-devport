@@ -133,7 +133,7 @@ Most Filipino students do not fully appreciate concepts because they often learn
 
 Instead of relying solely on tests that evaluate how well learners memorize information from their textbooks, I suggest the use of assessments that allow students to demonstrate their understanding through projects, whether in the form of a concept paper, research study, prototype, or performance task. If a teacher still wishes to administer examinations, these should be situational and reflective in nature so that they genuinely assess the students' learning and understanding rather than their ability to memorize information."
                 placeholder="Share your teaching philosophy here"
-                paragraphClassName="text-base leading-relaxed text-muted-foreground sm:text-lg"
+                paragraphClassName="mb-5 text-base leading-relaxed text-muted-foreground sm:text-lg"
               />
             </div>
           </div>
