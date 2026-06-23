@@ -117,6 +117,12 @@ function HomePage() {
             />
             <div>
               <EditableText
+                storageKey="home.philosophy.heading"
+                defaultValue="My Teaching Philosophy"
+                as="h2"
+                paragraphClassName="font-display text-3xl font-bold text-foreground sm:text-4xl"
+              />
+              <EditableText
                 storageKey="home.philosophy.body"
                 multiline
                 defaultValue="According to the news article of PhilStar Ngayon (2024), Filipino learners ranked 76th out of 81 countries in the Programme for International Student Assessment (PISA). This is not merely a statistic; rather, it reflects the challenges and shortcomings of the Philippine educational system. Therefore, it is important to construct an education system that promotes a Filipino student-centered curriculum and learning process.
