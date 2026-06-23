@@ -194,7 +194,7 @@ Instead of relying solely on tests that evaluate how well learners memorize info
           </div>
 
           <div className="mt-16 grid gap-6 sm:grid-cols-2">
-            {PRINCIPLES.map(({ storageKey, defaultTitle }) => (
+            {PRINCIPLES.map(({ storageKey, defaultTitle, defaultBody }) => (
               <div
                 key={storageKey}
                 className="group rounded-2xl border border-border bg-card p-8 shadow-soft transition-all hover:-translate-y-1 hover:shadow-elevated"
@@ -208,7 +208,7 @@ Instead of relying solely on tests that evaluate how well learners memorize info
                 />
                 <EditableText
                   storageKey={`${storageKey}.body`}
-                  defaultValue=""
+                  defaultValue={defaultBody}
                   multiline
                   placeholder="Describe this belief"
                   className="mt-3"
