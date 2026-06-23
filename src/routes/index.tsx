@@ -194,7 +194,7 @@ Instead of relying solely on tests that evaluate how well learners memorize info
             />
             <EditableText
               storageKey="home.beliefs.intro"
-              defaultValue=""
+              defaultValue="These four principles shape how I approach teaching, learning, and my continuous growth as an educator. They are not abstract ideals; they are commitments I have formed through my first-year experiences, reflections, and the challenges I have witnessed in Philippine education."
               placeholder="Add an introduction for your core beliefs"
               className="mx-auto mt-6 max-w-2xl"
               paragraphClassName="text-base text-muted-foreground"
