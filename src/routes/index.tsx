@@ -57,21 +57,29 @@ const PRINCIPLES = [
   {
     storageKey: "home.principle.1",
     defaultTitle: "Student-Centered Learning",
+    defaultBody:
+      "I believe that learners grasp concepts best when instruction is built around their language, context, and readiness. Drawing from my teaching philosophy, I advocate for a Filipino student-centered curriculum where teachers use the learners' mother tongue and student-friendly language to improve comprehension. I also emphasize project-based and performance assessments over rote memorization, ensuring that students demonstrate genuine understanding through concept papers, research studies, prototypes, and performance tasks.",
     tone: "bg-[oklch(0.95_0.04_265)] text-primary",
   },
   {
     storageKey: "home.principle.2",
     defaultTitle: "Collaborative Growth",
+    defaultBody:
+      "Learning is not an isolated act. Through experiences like the UTS Buddy Talks, PATHFit group activities, and case analyses in The Teacher and the School Curriculum, I have learned that growth accelerates when learners exchange ideas, give peer feedback, and solve problems together. I aim to foster classrooms where students and teachers alike learn from one another, building a community of shared inquiry and mutual respect.",
     tone: "bg-[oklch(0.95_0.04_295)] text-[oklch(0.5_0.2_295)]",
   },
   {
     storageKey: "home.principle.3",
     defaultTitle: "Real-World Connections",
+    defaultBody:
+      "Concepts come alive when learners see their relevance beyond the classroom. I support using digital simulators and online learning tools to bridge theory and practice, especially when physical resources are limited. Whether through the GAS Symposium discussions, Mathematics in the Modern World applications, or situational assessments in Purposive Communication, I seek to help students connect academic content to real-life situations they will encounter in their communities and future careers.",
     tone: "bg-[oklch(0.95_0.04_150)] text-[oklch(0.45_0.18_150)]",
   },
   {
     storageKey: "home.principle.4",
     defaultTitle: "Inclusive Excellence",
+    defaultBody:
+      "Every learner deserves equitable access to meaningful education. I am committed to creating learning environments that respect diverse backgrounds, abilities, and perspectives. From the multicultural discussions in Filipino sa Piling Larangan to the ethical reflections in Ethics, I recognize that inclusive classrooms nurture discernment and compassion. Excellence is not about uniformity; it is about honoring each student's potential and ensuring no one is left behind.",
     tone: "bg-[oklch(0.95_0.04_60)] text-[oklch(0.45_0.18_60)]",
   },
 ];
@@ -186,7 +194,7 @@ Instead of relying solely on tests that evaluate how well learners memorize info
             />
             <EditableText
               storageKey="home.beliefs.intro"
-              defaultValue=""
+              defaultValue="These four principles shape how I approach teaching, learning, and my continuous growth as an educator. They are not abstract ideals; they are commitments I have formed through my first-year experiences, reflections, and the challenges I have witnessed in Philippine education."
               placeholder="Add an introduction for your core beliefs"
               className="mx-auto mt-6 max-w-2xl"
               paragraphClassName="text-base text-muted-foreground"
@@ -194,7 +202,7 @@ Instead of relying solely on tests that evaluate how well learners memorize info
           </div>
 
           <div className="mt-16 grid gap-6 sm:grid-cols-2">
-            {PRINCIPLES.map(({ storageKey, defaultTitle }) => (
+            {PRINCIPLES.map(({ storageKey, defaultTitle, defaultBody }) => (
               <div
                 key={storageKey}
                 className="group rounded-2xl border border-border bg-card p-8 shadow-soft transition-all hover:-translate-y-1 hover:shadow-elevated"
@@ -208,7 +216,7 @@ Instead of relying solely on tests that evaluate how well learners memorize info
                 />
                 <EditableText
                   storageKey={`${storageKey}.body`}
-                  defaultValue=""
+                  defaultValue={defaultBody}
                   multiline
                   placeholder="Describe this belief"
                   className="mt-3"
